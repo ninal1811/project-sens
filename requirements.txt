@@ -4,3 +4,6 @@ flask_cors
 pymongo
 werkzeug==3.0.6
 pandas
+requests
+numpy
+pymongo
