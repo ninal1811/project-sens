@@ -10,3 +10,7 @@ def create(data, dict):
     new_id = str(len(city_cache) + 1)
     city_cache[new_id] = data
     return new_id
+
+def num_cities():
+    return len(city_cache)
+
