@@ -22,6 +22,11 @@ city_cache = {
     2: SAMPLE_CITY_2,
 }
 
+def db_connect(success_ratio: int) -> bool:
+    # returns True if connected to the DB, False otherwise
+    return randint(1, success_ratio) % success_ratio
+
+
 def create(data, dict):
     if not isinstance(data, dict):
         raise ValueError(f'Bad type for {type(data)=}')
@@ -31,6 +36,15 @@ def create(data, dict):
     city_cache[new_id] = data
     return new_id
 
+
 def num_cities():
     return len(city_cache)
+
+
+def main():
+    print()
+
+
+if __name__=='__main__':
+    main()
 
