@@ -1,5 +1,25 @@
+from random import randint
+
+MIN_ID_LEN = 1
+
+ID = 'id'
+NAME = 'name'
+STATE_CODE = 'state_code'
+
+SAMPLE_CITY_1 = {
+    NAME: 'New York City',
+    STATE_CODE: 'NY',
+}
+
+SAMPLE_CITY_2 = { 
+    NAME: 'New Orleans',
+    STATE_CODE: 'LA',
+}
+
+# using the ID as the key
 city_cache = {
-    
+    1: SAMPLE_CITY_1,
+    2: SAMPLE_CITY_2,
 }
 
 def create(data, dict):
