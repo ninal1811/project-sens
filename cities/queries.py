@@ -27,7 +27,7 @@ def db_connect(success_ratio: int) -> bool:
     return randint(1, success_ratio) % success_ratio
 
 
-def create(data, dict):
+def create(data: dict) -> str:
     if not isinstance(data, dict):
         raise ValueError(f'Bad type for {type(data)=}')
     if not data.get(NAME):
@@ -37,12 +37,23 @@ def create(data, dict):
     return new_id
 
 
-def num_cities():
+def num_cities() -> int:
     return len(city_cache)
+    
+def is_valid_id(_id: str) -> bool:
+    if not isinstance(_id, str):
+        return False
+    if len(_id) < MIN_ID_LEN:
+        return False
+    return True
 
+def read() -> dict:
+    if not db_connect(3):
+        raise ConnectionError('Could not connect to DB.')
+    return city_cache
 
 def main():
-    print()
+    print(read())
 
 
 if __name__=='__main__':
