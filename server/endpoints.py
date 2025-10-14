@@ -14,18 +14,20 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app)
 api = Api(app)
+
 ERROR = "Error"
-READ = 'read'
+READ = "read"
 
-ENDPOINT_EP = '/endpoints'
-ENDPOINT_RESP = 'Available endpoints'
+ENDPOINT_EP = "/endpoints"
+ENDPOINT_RESP = "Available endpoints"
 
-HELLO_EP = '/hello'
-HELLO_RESP = 'hello'
-MESSAGE = 'Message'
+HELLO_EP = "/hello"
+HELLO_RESP = "hello"
+MESSAGE = "Message"
 
-CITIES_EPS = '/cities'
-CITY_RESP = 'Cities'
+CITIES_EPS = "/cities"
+CITY_RESP = "Cities"
+
 
 @api.route(f'{CITIES_EPS}/{READ}')
 class Cities(Resource):
@@ -33,17 +35,20 @@ class Cities(Resource):
     The purpose of the HelloWorld class is to have a simple test to see if the
     app is working at all.
     """
+
     def get(self):
         """
         A trivial endpoint to see if the server is running.
         """
+
         try:
             cities = cqry.read()
-        #prints out the names and the valies with f string
+        # prints out the names and the valies with f string
         except ConnectionError as e:
             return {ERROR: str(e)}
         print(f'{cities=}')
         return {CITY_RESP: cities}
+
 
 @api.route(HELLO_EP)
 class HelloWorld(Resource):
@@ -56,6 +61,7 @@ class HelloWorld(Resource):
         A trivial endpoint to see if the server is running.
         """
         return {HELLO_RESP: 'world'}
+
 
 @api.route(ENDPOINT_EP)
 class Endpoints(Resource):
