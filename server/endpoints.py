@@ -14,15 +14,20 @@ app = Flask(__name__)
 CORS(app)
 api = Api(app)
 
+READ = 'read'
+
 ENDPOINT_EP = '/endpoints'
 ENDPOINT_RESP = 'Available endpoints'
+
 HELLO_EP = '/hello'
 HELLO_RESP = 'hello'
 MESSAGE = 'Message'
 
+CITIES_EPS = '/cities'
+CITY_RESP = 'Cities'
 
 @api.route(HELLO_EP)
-class HelloWorld(Resource):
+class He(Resource):
     """
     The purpose of the HelloWorld class is to have a simple test to see if the
     app is working at all.
@@ -31,7 +36,7 @@ class HelloWorld(Resource):
         """
         A trivial endpoint to see if the server is running.
         """
-        return {HELLO_RESP: 'world'}
+        return {CITY_RESP: 'world'}
 
 
 @api.route(ENDPOINT_EP)
