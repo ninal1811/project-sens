@@ -3,6 +3,11 @@ import pytest
 
 import cities.queries as qry
 
+@pytest.fixture(scope='function')
+def temp_city():
+    new_rec_id = qry.create(qry.SAMPLE_CITY)
+    yield new_rec_id
+
 @pytest.mark.skip('This is an example of a bad test!')
 def test_bad_test_from_num_cities():
     assert qry.num_cities() == len(qry.city_cache)
