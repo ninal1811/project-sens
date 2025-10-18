@@ -26,6 +26,11 @@ def db_connect(success_ratio: int) -> bool:
     # returns True if connected to the DB, False otherwise
     return randint(1, success_ratio) % success_ratio
 
+def delete(city_id: str) -> bool:
+    if city_id not in city_cache:
+        raise ValueError(f'No such city: {city_id}')
+    del city_cache[city_id]
+    return True
 
 def create(data: dict) -> str:
     if not isinstance(data, dict):
