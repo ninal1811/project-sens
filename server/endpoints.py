@@ -32,6 +32,7 @@ HEALTH_EP = "/health"
 VERSION_EP = "/version"
 VERSION_NAME = "project-sens"
 
+
 @api.route(f'{CITIES_EPS}/{READ}')
 class Cities(Resource):
     """
@@ -79,6 +80,7 @@ class Endpoints(Resource):
         endpoints = sorted(rule.rule for rule in api.app.url_map.iter_rules())
         return {"Available endpoints": endpoints}
 
+
 @api.route(HEALTH_EP)
 class Health(Resource):
     """
@@ -86,4 +88,3 @@ class Health(Resource):
     """
     def get(self):
         return {"status": "ok"}, 200
-
