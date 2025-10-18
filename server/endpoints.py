@@ -96,9 +96,9 @@ class Version(Resource):
     An endpoint that returns version information
     """
     def get(self):
-    import os
-    return {
+        import os
+        return {
             "name": os.getenv("APP_NAME", VERSION_NAME),
             "version": os.getenv("APP_VERSION", "0.1.0"),
             "env": os.getenv("APP_ENV", "dev"),
-    }, 200
+        }, 200
