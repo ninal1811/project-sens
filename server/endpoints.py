@@ -84,7 +84,21 @@ class Endpoints(Resource):
 @api.route(HEALTH_EP)
 class Health(Resource):
     """
-    Checking to see if the API is responsive"
+    An endpoint checking to see if the API is responsive"
     """
     def get(self):
         return {"status": "ok"}, 200
+
+
+@api.route(VERSION_EP)
+class Version(Resource):
+    """
+    An endpoint that returns version information"
+    """
+    def get(self):
+        import os
+        return {
+            "name": os.getenv("APP_NAME", VERSION_NAME), 
+            "version": os.getenv("APP_VERSION", "0.1.0"), 
+            "env": os.getenv("APP_ENV", "dev"),
+        }, 200
