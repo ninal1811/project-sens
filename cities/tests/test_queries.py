@@ -7,6 +7,10 @@ import cities.queries as qry
 def temp_city():
     new_rec_id = qry.create(qry.SAMPLE_CITY)
     yield new_rec_id
+    try:
+        qry.delete(new_rec_id)
+    except ValueError:
+        print('The record was already deleted.')
 
 @pytest.mark.skip('This is an example of a bad test!')
 def test_bad_test_from_num_cities():
