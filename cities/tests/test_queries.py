@@ -48,3 +48,8 @@ def test_read(mock_db_connect):
 def test_read_connection(mock_db_connect):
     with pytest.raises(ConnectionError):
         cities = qry.read()
+
+@patch('cities.queries.db_connect', return_value=True, autospec=True)
+def test_delete(mock_db_connect, temp_city):
+    qry.delete(temp_city)
+    assert temp_city not in qry.read()
