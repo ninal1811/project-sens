@@ -22,6 +22,12 @@ city_cache = {
     2: SAMPLE_CITY_2,
 }
 
+def get_city(city_id: str) -> dict:
+    """Retrieve a city record by ID."""
+    if city_id not in city_cache:
+        raise ValueError(f'City with ID {city_id} not found.')
+    return city_cache[city_id]
+
 def db_connect(success_ratio: int) -> bool:
     # returns True if connected to the DB, False otherwise
     return randint(1, success_ratio) % success_ratio
@@ -59,6 +65,11 @@ def read() -> dict:
 
 def main():
     print(read())
+    try:
+        city = get_city('1')
+        print(f"Retrieved city: {city}")
+    except ValueError as e:
+        print(f"Error: {e}")
 
 
 if __name__=='__main__':
