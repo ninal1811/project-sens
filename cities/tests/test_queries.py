@@ -9,8 +9,9 @@ def temp_city():
     yield new_rec_id
     try:
         qry.delete(new_rec_id)
-    except ValueError:
-        print('The record was already deleted.')
+        print(f"[DEBUG] Successfully deleted temp city ID: {new_rec_id}")
+    except ValueError as e:
+        print(f"[WARN] Cleanup skipped: {e}")
 
 @pytest.mark.skip('This is an example of a bad test!')
 def test_bad_test_from_num_cities():
@@ -19,8 +20,11 @@ def test_bad_test_from_num_cities():
 def test_num_cities():
     # get the count
     old_count = qry.num_cities()
+    print(f"[DEBUG] old_count={old_count}")
+
     # add a record
     qry.create(qry.SAMPLE_CITY)
+    assert qry.is_valid_id(new_id), "[ERROR] Invalid ID returned from create()"
     assert qry.num_cities() == old_count + 1
     
 def test_good_cities():
