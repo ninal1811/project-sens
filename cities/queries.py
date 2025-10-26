@@ -6,20 +6,18 @@ ID = 'id'
 NAME = 'name'
 STATE_CODE = 'state_code'
 
-SAMPLE_CITY_1 = {
+SAMPLE_CITY = {
     NAME: 'New York City',
     STATE_CODE: 'NY',
 }
 
-SAMPLE_CITY_2 = { 
-    NAME: 'New Orleans',
-    STATE_CODE: 'LA',
-}
-
 # using the ID as the key
 city_cache = {
-    1: SAMPLE_CITY_1,
-    2: SAMPLE_CITY_2,
+    1: SAMPLE_CITY,
+    2: {
+        NAME: 'New Orleans',
+        STATE_CODE: 'LA',
+    },
 }
 
 def get_city(city_id: str) -> dict:
