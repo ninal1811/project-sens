@@ -12,6 +12,19 @@ def temp_city():
         print(f"[DEBUG] Successfully deleted temp city ID: {new_rec_id}")
     except ValueError as e:
         print(f"[WARN] Cleanup skipped: {e}")
+        
+@pytest.fixture
+def reset_cache():
+    original_cache = qry.city_cache.copy()
+    yield
+    qry.city_cache.clear()
+    qry.city_cache.update(original_cache)
+    
+def test_reset_cache():
+    original_cache = qry.num_cities()
+    test_id = qry.create({'name': 'city', 'state_code': 'state'})
+    assert qry.num_cities() == original_cache + 1
+    assert test_id in qry.city_cache
 
 @pytest.mark.skip('This is an example of a bad test!')
 def test_bad_test_from_num_cities():
