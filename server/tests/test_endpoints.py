@@ -48,6 +48,26 @@ def test_hello():
     resp_json = resp.get_json()
     assert ep.HELLO_RESP in resp_json
 
+# Mock the DB/read function so we don't touch real data during the test
+@patch("cities.queries.read", return_value=[{"name": "NYC"}] * 10)
+def test_cities_bad_limit_ignored_returns_200(mock_read, client):
+    # Endpoint ignores bad ?limit= and still returns 200 with the full list.
+    resp = client.get(f"{ep.CITIES_EPS}/{ep.READ}?limit=notanint")
+    assert resp.status_code == 200
+    body = resp.get_json()
+    assert ep.CITY_RESP in body
+    assert len(body[ep.CITY_RESP]) == 10  # unchanged
+    mock_read.assert_called_once()
+
+@patch("cities.queries.read", return_value=[{"name": "NYC"}, {"name": "LA"}])
+def test_cities_success(mock_read, client):
+    resp = client.get(f"{ep.CITIES_EPS}/{ep.READ}")
+    assert resp.status_code == 200
+    body = resp.get_json()
+    assert ep.CITY_RESP in body
+    assert body[ep.CITY_RESP] == [{"name": "NYC"}, {"name": "LA"}]
+    mock_read.assert_called_once()
+
 @pytest.mark.skip(reason="Integration placeholder—enable when asserting full endpoint list")
 def test_endpoints_listing(client):
     resp = client.get(ep.ENDPOINT_EP)
