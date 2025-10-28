@@ -15,8 +15,40 @@ import server.endpoints as ep
 
 TEST_CLIENT = ep.app.test_client()
 
+@pytest.fixture(scope="module")
+def client():
+    """Flask test client for all tests in this module."""
+    return ep.app.test_client()
+
+# Test that /hello returns correct status + JSON format
+def test_hello_ok(client):
+    resp = client.get(ep.HELLO_EP)
+    assert resp.status_code == 200
+    assert resp.get_json() == {ep.HELLO_RESP: "world"}
+
+# Test helper function: invalid values should raise ValueError
+def test_parse_limit_raises_on_invalid():
+    # invalid strings should raise
+    with pytest.raises(ValueError):
+        ep.parse_limit("abc")
+    # zero/negative should raise
+    with pytest.raises(ValueError):
+        ep.parse_limit("0")
+    with pytest.raises(ValueError):
+        ep.parse_limit("-5")
+# Test valid inputs for parse_limit helper
+def test_parse_limit_valid_cases():
+    assert ep.parse_limit(None) is None
+    assert ep.parse_limit("") is None
+    assert ep.parse_limit("3") == 3
+
 
 def test_hello():
     resp = TEST_CLIENT.get(ep.HELLO_EP)
     resp_json = resp.get_json()
     assert ep.HELLO_RESP in resp_json
+
+@pytest.mark.skip(reason="Integration placeholder—enable when asserting full endpoint list")
+def test_endpoints_listing(client):
+    resp = client.get(ep.ENDPOINT_EP)
+    assert resp.status_code == 200
