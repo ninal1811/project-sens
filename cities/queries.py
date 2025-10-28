@@ -1,6 +1,7 @@
-from random import randint
+import data.db_connect as dbc
 
 MIN_ID_LEN = 1
+CITY_COLLECTION = 'cities'
 
 ID = 'id'
 NAME = 'name'
@@ -26,10 +27,6 @@ def get_city(city_id: str) -> dict:
         raise ValueError(f'City with ID {city_id} not found.')
     return city_cache[city_id]
 
-def db_connect(success_ratio: int) -> bool:
-    # returns True if connected to the DB, False otherwise
-    return randint(1, success_ratio) % success_ratio
-
 def delete(city_id: str) -> bool:
     if city_id not in city_cache:
         raise ValueError(f'No such city: {city_id}')
@@ -37,12 +34,13 @@ def delete(city_id: str) -> bool:
     return True
 
 def create(data: dict) -> str:
+    dbc.connect_db()
     if not isinstance(data, dict):
         raise ValueError(f'Bad type for {type(data)=}')
     if not data.get(NAME):
         raise ValueError(f'Bad type for {data.get(NAME)=}')
-    new_id = str(len(city_cache) + 1)
-    city_cache[new_id] = data
+    new_id = dbc.create(CITY_COLLECTION, data)
+    print(f'{new_id=}')
     return new_id
 
 
@@ -57,8 +55,6 @@ def is_valid_id(_id: str) -> bool:
     return True
 
 def read() -> dict:
-    if not db_connect(3):
-        raise ConnectionError('Could not connect to DB.')
     return city_cache
 
 def main():
