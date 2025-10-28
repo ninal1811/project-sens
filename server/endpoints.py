@@ -5,7 +5,7 @@ The endpoint called `endpoints` will return all available endpoints.
 # from http import HTTPStatus
 import cities.queries as cqry
 
-from flask import Flask, request  # , request
+from flask import Flask  # , request
 from flask_restx import Resource, Api  # , fields  # Namespace
 from flask_cors import CORS
 
@@ -102,8 +102,9 @@ class Version(Resource):
             "version": os.getenv("APP_VERSION", "0.1.0"),
             "env": os.getenv("APP_ENV", "dev"),
         }, 200
-    
-#Helper function for testing raise and enpoint behavior
+# Helper function for testing raise and enpoint behavior
+
+
 def parse_limit(raw):
     """
     Parse ?limit= query parameter.
@@ -114,6 +115,6 @@ def parse_limit(raw):
         return None
     n = int(raw)  # may raise ValueError
     if n <= 0:
+
         raise ValueError("limit must be positive")
     return n
-
