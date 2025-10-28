@@ -77,3 +77,8 @@ def test_delete(temp_city):
 def test_delete_not_there():
     with pytest.raises(ValueError):
         qry.delete('Some value that is not there')
+
+@pytest.mark.skip(reason="Feature pending full implementation.")
+def test_is_valid_id_whitespace():
+    assert qry.is_valid_id(" ") is False
+
