@@ -26,6 +26,11 @@ def test_reset_cache():
     assert qry.num_cities() == original_cache + 1
     assert test_id in qry.city_cache
 
+def test_create_db_failure():
+    with patch('cities.queries.dbc.create', side_effect=RuntimeError("DB error")):
+        with pytest.raises(RuntimeError):
+            qry.create(qry.SAMPLE_CITY)
+
 @pytest.mark.skip('This is an example of a bad test!')
 def test_bad_test_from_num_cities():
     assert qry.num_cities() == len(qry.city_cache)
