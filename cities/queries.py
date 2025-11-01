@@ -27,11 +27,11 @@ def get_city(city_id: str) -> dict:
         raise ValueError(f'City with ID {city_id} not found.')
     return city_cache[city_id]
 
-def delete(city_id: str) -> bool:
-    if city_id not in city_cache:
-        raise ValueError(f'No such city: {city_id}')
-    del city_cache[city_id]
-    return True
+def delete(name: str, state_code: str) -> bool:
+    ret = dbc.delete(CITY_COLLECTION, {NAME: name, STATE_CODE: state_code})
+    if ret < 1:
+        raise ValueError(f'City not found: {name}, {state_code}')
+    return ret
 
 def create(data: dict) -> str:
     print(f'{data=}')
