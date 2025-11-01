@@ -34,7 +34,7 @@ def delete(city_id: str) -> bool:
     return True
 
 def create(data: dict) -> str:
-    dbc.connect_db()
+    print(f'{data=}')
     if not isinstance(data, dict):
         raise ValueError(f'Bad type for {type(data)=}')
     if not data.get(NAME):
@@ -45,7 +45,7 @@ def create(data: dict) -> str:
 
 
 def num_cities() -> int:
-    return len(city_cache)
+    return len(read())
     
 def is_valid_id(_id: str) -> bool:
     if not isinstance(_id, str):
@@ -55,7 +55,7 @@ def is_valid_id(_id: str) -> bool:
     return True
 
 def read() -> dict:
-    return city_cache
+    return dbc.read(CITY_COLLECTION)
 
 def main():
     print(read())
