@@ -92,3 +92,6 @@ def test_delete_not_there():
 def test_is_valid_id_whitespace():
     assert qry.is_valid_id(" ") is False
 
+def test_get_cities_by_state():
+    result = qry.get_cities_by_state('NY')
+    assert all(city['state_code'] == 'NY' for city in result.values())
