@@ -27,6 +27,12 @@ def get_city(city_id: str) -> dict:
         raise ValueError(f'City with ID {city_id} not found.')
     return city_cache[city_id]
 
+def get_cities_by_state(state_code: str) -> dict:
+    """Retrieve all cities that match the given state code"""
+    if not isinstance(state_code, str) or not state_code:
+        raise ValueError(f'State code {state_code} not found.')
+    return {cid: city for cid, city in city_cache.items() if city['state_code'] == state_code}
+
 def delete(name: str, state_code: str) -> bool:
     ret = dbc.delete(CITY_COLLECTION, {NAME: name, STATE_CODE: state_code})
     if ret < 1:
