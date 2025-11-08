@@ -24,6 +24,26 @@ def needs_db(fn, *args, **kwargs):
         return fn(*args, **kwargs)
     return wrapper
 
+def handling_errors(fn):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        try:
+            return fn(*args, **kwargs)
+        except ConnectionFailure as e:
+            print("MongoDB connection failed")
+            raise
+        except ServerSelectionTimeoutError as e:
+            print("MongoDB server selection timeout")
+            raise
+        except PyMongoError as e:
+            print("MongoDB error")
+            raise
+        except Exception as e:
+            print("Unexpected error")
+            raise
+    return wrapper
+
+@handling_errors
 def connect_db():
     """
     This provides a uniform way to connect to the DB across all uses.
@@ -55,7 +75,7 @@ def convert_mongo_id(doc: dict):
         # Convert mongo ID to a string so it works as JSON
         doc[MONGO_ID] = str(doc[MONGO_ID])
 
-
+@handling_errors
 def create(collection, doc, db=SENS_DB):
     """
     Insert a single doc into collection.
@@ -63,7 +83,7 @@ def create(collection, doc, db=SENS_DB):
     print(f'{db=}')
     return client[db][collection].insert_one(doc)
 
-
+@handling_errors
 def read_one(collection, filt, db=SENS_DB):
     """
     Find with a filter and return on the first doc found.
@@ -73,7 +93,7 @@ def read_one(collection, filt, db=SENS_DB):
         convert_mongo_id(doc)
         return doc
 
-
+@handling_errors
 def delete(collection: str, filt: dict, db=SENS_DB):
     """
     Find with a filter and return on the first doc found.
@@ -82,11 +102,11 @@ def delete(collection: str, filt: dict, db=SENS_DB):
     del_result = client[db][collection].delete_one(filt)
     return del_result.deleted_count
 
-
+@handling_errors
 def update(collection, filters, update_dict, db=SENS_DB):
     return client[db][collection].update_one(filters, {'$set': update_dict})
 
-
+@handling_errors
 def read(collection, db=SENS_DB, no_id=True) -> list:
     """
     Returns a list from the db.
@@ -100,7 +120,7 @@ def read(collection, db=SENS_DB, no_id=True) -> list:
         ret.append(doc)
     return ret
 
-
+@handling_errors
 def read_dict(collection, key, db=SENS_DB, no_id=True) -> dict:
     recs = read(collection, db=db, no_id=no_id)
     recs_as_dict = {}
@@ -108,7 +128,7 @@ def read_dict(collection, key, db=SENS_DB, no_id=True) -> dict:
         recs_as_dict[rec[key]] = rec
     return recs_as_dict
 
-
+@handling_errors
 def fetch_all_as_dict(key, collection, db=SENS_DB):
     ret = {}
     for doc in client[db][collection].find():
