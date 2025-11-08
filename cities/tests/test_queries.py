@@ -15,10 +15,11 @@ def temp_city_no_del():
 
 @pytest.fixture(scope='function')
 def temp_city():
-    new_rec_id = qry.create(qry.SAMPLE_CITY)
+    temp_rec = get_temp_rec()
+    new_rec_id = qry.create(get_temp_rec())
     yield new_rec_id
     try:
-        qry.delete(new_rec_id)
+        qry.delete(temp_rec[qry.NAME], temp_rec[qry.STATE_CODE])
         print(f"[DEBUG] Successfully deleted temp city ID: {new_rec_id}")
     except ValueError as e:
         print(f"[WARN] Cleanup skipped: {e}")
@@ -49,13 +50,13 @@ def test_bad_test_from_num_cities():
 def test_num_cities(temp_city):
     # get the count
     old_count = qry.num_cities()
-    new_rec_id = qry.create(qry.SAMPLE_CITY)
+    new_rec_id = qry.create(get_temp_rec())
     assert qry.is_valid_id(new_rec_id)
     assert qry.num_cities() == old_count + 1
     
 def test_good_cities():
     old_count = qry.num_cities()
-    new_rec_id = qry.create(qry.SAMPLE_CITY)
+    new_rec_id = qry.create(get_temp_rec())
     assert qry.is_valid_id(new_rec_id)
     assert qry.num_cities() == old_count + 1
     
@@ -69,24 +70,17 @@ def test_create_bad_param_type():
 
 @pytest.mark.skip('Feature pending full implementation rollout')
 def test_read():
-    new_rec_id = qry.create(qry.SAMPLE_CITY)
-    cities = qry.read()
-    assert isinstance(cities, dict)
-    assert len(cities) > 1
-    
-@pytest.mark.skip('Feature pending full implementation rollout')
-def test_read_connection():
-    with pytest.raises(ConnectionError):
-        cities = qry.read()
+    assert isinstance(cities, list)
+    assert get_temp_rec() in cities
 
 @pytest.mark.skip('Feature pending full implementation rollout')
-def test_delete(temp_city):
-    qry.delete(temp_city)
-    assert temp_city not in qry.read()
+def test_delete(temp_city_no_del):
+    ret = qry.delete(temp_city_no_del[qry.NAME], temp_city_no_del[qry.STATE_CODE])
+    assert ret == 1
 
 def test_delete_not_there():
     with pytest.raises(ValueError):
-        qry.delete('Some value that is not there')
+        qry.delete('Some city name that is not there', 'not a state')
 
 @pytest.mark.skip(reason="Feature pending full implementation.")
 def test_is_valid_id_whitespace():
