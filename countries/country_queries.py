@@ -37,3 +37,9 @@ def num_countries() -> int:
 
 def read_all() -> dict:
     return country_cache
+
+def is_valid_capital(capital: str) -> bool:
+    if not isinstance(capital, str):
+        logging.error("Invalid type for capital. Capital should be a string.")
+        return False
+
