@@ -39,6 +39,17 @@ def delete(name: str, state_code: str) -> bool:
         raise ValueError(f'City not found: {name}, {state_code}')
     return ret
 
+def update_city(city_id: str, new_data: dict) -> bool:
+    if not is_valid_id(city_id):
+        raise ValueError(f"Invalid ID: {city_id}")
+    if not new_data:
+        raise ValueError("No update data provided.")
+    
+    ret = dbc.update(CITY_COLLECTION, {ID: city_id}, new_data)
+    if ret < 1:
+        raise ValueError(f"No city found to update: {city_id}")
+    return True
+
 def create(data: dict) -> str:
     print(f'{data=}')
     if not isinstance(data, dict):
