@@ -100,3 +100,24 @@ def read_feature(feature_name: str) -> dict:
         return security_recs[feature_name]
     else:
         return None
+
+
+@needs_recs
+def validate_security_record(record: dict) -> bool:
+    """
+    Validate that a security record has the correct structure.
+    Args:
+        record: The security record to validate
+    Returns:
+        True if valid, False otherwise
+    """
+    required_ops = [CREATE, READ, UPDATE, DELETE]
+    for feature_name, feature_data in record.items():
+        for op in feature_data.keys():
+            if op not in required_ops:
+                return False
+            if USER_LIST not in feature_data[op]:
+                return False
+            if CHECKS not in feature_data[op]:
+                return False
+    return True
