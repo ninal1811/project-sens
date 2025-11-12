@@ -118,3 +118,26 @@ def parse_limit(raw):
 
         raise ValueError("limit must be positive")
     return n
+
+
+@api.route(f'{CITIES_EPS}/<string:city_name>')
+class CityDetails(Resource):
+    """
+    Get details for a specific city
+    """
+    def get(self, city_name):
+        """
+        Retrieve details for a single city by name
+        """
+        try:
+            cities = cqry.read()
+            if city_name not in cities:
+                return {ERROR: f"City '{city_name}' not found"}, 404
+            return {
+                CITY_RESP: city_name,
+                "details": cities[city_name]
+            }, 200
+        except ConnectionError as e:
+            return {ERROR: str(e)}, 500
+        except Exception as e:
+            return {ERROR: str(e)}, 500
