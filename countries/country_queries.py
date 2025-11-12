@@ -30,6 +30,10 @@ def get_country(country_id: int) -> dict:
         raise ValueError(f"No such country with id {country_id}.")
     return country_cache[country_id]
 
+def search_country(keyword: str) -> dict:
+    if not keyword:
+        raise ValueError("Keyword must not be empty.")
+    return {cid: c for cid, c in country_cache.items() if keyword.lower() in c[NAME].lower()}
 
 def num_countries() -> int:
     return len(country_cache)
