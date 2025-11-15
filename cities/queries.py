@@ -20,18 +20,27 @@ city_cache = {
         STATE_CODE: 'LA',
     },
 }
-
 def get_city(city_id: str) -> dict:
     """Retrieve a city record by ID."""
-    if city_id not in city_cache:
+    if not is_valid_id(city_id):
+        raise ValueError(f"Invalid ID: {city_id}")
+    
+    doc = dbc.read_one(CITY_COLLECTION, {ID: city_id})
+    if doc is None:
         raise ValueError(f'City with ID {city_id} not found.')
-    return city_cache[city_id]
+    return doc
 
 def get_cities_by_state(state_code: str) -> dict:
     """Retrieve all cities that match the given state code"""
     if not isinstance(state_code, str) or not state_code:
-        raise ValueError(f'State code {state_code} not found.')
-    return {cid: city for cid, city in city_cache.items() if city['state_code'] == state_code}
+        raise ValueError(f'Bad state code: {state_code}')
+    
+    cities = dbc.read(CITY_COLLECTION)  # returns a list of docs
+    return {
+        city[ID]: city
+        for city in cities
+        if city.get(STATE_CODE) == state_code
+    }
 
 def delete(name: str, state_code: str) -> bool:
     ret = dbc.delete(CITY_COLLECTION, {NAME: name, STATE_CODE: state_code})
