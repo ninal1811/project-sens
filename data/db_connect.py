@@ -5,6 +5,11 @@ We may be required to use a new database at any point.
 import os
 from functools import wraps
 import pymongo as pm
+from pymongo.errors import (
+    ConnectionFailure,
+    ServerSelectionTimeoutError,
+    PyMongoError,
+)
 
 LOCAL = "0"
 CLOUD = "1"
@@ -75,6 +80,7 @@ def convert_mongo_id(doc: dict):
         # Convert mongo ID to a string so it works as JSON
         doc[MONGO_ID] = str(doc[MONGO_ID])
 
+@needs_db
 @handling_errors
 def create(collection, doc, db=SENS_DB):
     """
@@ -83,6 +89,7 @@ def create(collection, doc, db=SENS_DB):
     print(f'{db=}')
     return client[db][collection].insert_one(doc)
 
+@needs_db
 @handling_errors
 def read_one(collection, filt, db=SENS_DB):
     """
@@ -93,6 +100,7 @@ def read_one(collection, filt, db=SENS_DB):
         convert_mongo_id(doc)
         return doc
 
+@needs_db
 @handling_errors
 def delete(collection: str, filt: dict, db=SENS_DB):
     """
@@ -102,10 +110,12 @@ def delete(collection: str, filt: dict, db=SENS_DB):
     del_result = client[db][collection].delete_one(filt)
     return del_result.deleted_count
 
+@needs_db
 @handling_errors
 def update(collection, filters, update_dict, db=SENS_DB):
     return client[db][collection].update_one(filters, {'$set': update_dict})
 
+@needs_db
 @handling_errors
 def read(collection, db=SENS_DB, no_id=True) -> list:
     """
@@ -120,6 +130,7 @@ def read(collection, db=SENS_DB, no_id=True) -> list:
         ret.append(doc)
     return ret
 
+@needs_db
 @handling_errors
 def read_dict(collection, key, db=SENS_DB, no_id=True) -> dict:
     recs = read(collection, db=db, no_id=no_id)
@@ -128,6 +139,7 @@ def read_dict(collection, key, db=SENS_DB, no_id=True) -> dict:
         recs_as_dict[rec[key]] = rec
     return recs_as_dict
 
+@needs_db
 @handling_errors
 def fetch_all_as_dict(key, collection, db=SENS_DB):
     ret = {}
