@@ -58,6 +58,12 @@ def delete_country(country_id: int) -> bool:
         raise ValueError(f"Country with id {country_id} not found.")
     return True
 
+def get_capital_by_name(name: str) -> str:
+    docs = dbc.read_one(COUNTRY_COLLECTION, {NAME: name})
+    if docs is None:
+        raise ValueError(f"No country found with name {name}")
+    return docs[CAPITAL]
+
 def num_countries() -> int:
     return len(read_all())
 
