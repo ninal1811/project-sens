@@ -120,6 +120,7 @@ def parse_limit(raw):
     return n
 
 
+
 @api.route(f'{CITIES_EPS}/<string:city_name>')
 class CityDetails(Resource):
     """
@@ -140,4 +141,15 @@ class CityDetails(Resource):
         except ConnectionError as e:
             return {ERROR: str(e)}, 500
         except Exception as e:
+            return {ERROR: str(e)}, 500
+    def delete(self, city_name):
+        """
+        Delete a specific city by name
+        """
+        try:
+            result = cqry.delete(city_name)
+            if not result:
+                return {ERROR: f"City '{city_name}' not found"}, 404
+            return {MESSAGE: f"City '{city_name}' deleted successfully"}, 200
+        except ConnectionError as e:
             return {ERROR: str(e)}, 500
