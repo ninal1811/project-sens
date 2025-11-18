@@ -1,3 +1,4 @@
+import data.db_connect as dbc
 import logging
 logging.basicConfig(level=logging.INFO)
 
@@ -18,7 +19,6 @@ country_cache = {
         CAPITAL: "Paris",
     },
 }
-
 
 def add_country(country_id: int, name: str, capital: str) -> None:
     doc = {
@@ -42,7 +42,7 @@ def get_country(country_id: int) -> dict:
 def search_country(keyword: str) -> dict:
     if not keyword:
         raise ValueError("Keyword must not be empty.")
-     keyword_lower = keyword.lower()
+    keyword_lower = keyword.lower()
     all_countries = read_all()  # dict keyed by ID
 
     return {
@@ -51,6 +51,12 @@ def search_country(keyword: str) -> dict:
         if isinstance(c.get(NAME), str)
         and keyword_lower in c[NAME].lower()
     }
+
+def delete_country(country_id: int) -> bool:
+    result = dbc.delete(COUNTRY_COLLECTION, {ID: country_id})
+    if result < 1:
+        raise ValueError(f"Country with id {country_id} not found.")
+    return True
 
 def num_countries() -> int:
     return len(read_all())
