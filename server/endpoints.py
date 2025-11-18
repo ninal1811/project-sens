@@ -8,6 +8,7 @@ import cities.queries as cqry
 from flask import Flask  # , request
 from flask_restx import Resource, Api  # , fields  # Namespace
 from flask_cors import CORS
+from flask import request
 
 # import werkzeug.exceptions as wz
 
@@ -120,7 +121,6 @@ def parse_limit(raw):
     return n
 
 
-
 @api.route(f'{CITIES_EPS}/<string:city_name>')
 class CityDetails(Resource):
     """
@@ -142,6 +142,7 @@ class CityDetails(Resource):
             return {ERROR: str(e)}, 500
         except Exception as e:
             return {ERROR: str(e)}, 500
+
     def delete(self, city_name):
         """
         Delete a specific city by name
@@ -152,4 +153,21 @@ class CityDetails(Resource):
                 return {ERROR: f"City '{city_name}' not found"}, 404
             return {MESSAGE: f"City '{city_name}' deleted successfully"}, 200
         except ConnectionError as e:
+            return {ERROR: str(e)}, 500
+
+
+@api.route(f'{CITIES_EPS}/create')
+class CreateCity(Resource):
+    def post(self):
+        """
+        Create a new city
+        """
+        try:
+            data = request.get_json()
+            if not data or 'name' not in data:
+                return {ERROR: "City name required"}, 400
+
+            result = cqry.create(data['name'], data.get('details', {}))
+            return {MESSAGE: "City created", CITY_RESP: result}, 201
+        except Exception as e:
             return {ERROR: str(e)}, 500
