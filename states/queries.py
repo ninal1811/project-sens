@@ -20,6 +20,29 @@ SAMPLE_STATE = {
 
 cache = None
 
+def needs_cache(fn, *args, **kwargs):
+    @wraps(fn)
+    def wrapper(*args, **kwargs):
+        if not cache:
+            load_cache()
+        return fn(*args, **kwargs)
+    return wrapper
+    
+@needs_cache
+def count():
+    return len(cache)
+    
+@needs_cache
+def read():
+    return cache
+    
+def load_cache():
+    global cache
+    cache = {}
+    states = dbc.read(STATE_COLLECTION)
+    for state in states:
+        cache[(state[CODE], state[COUNTRY_CODE])] = state
+
 def main():
     create(SAMPLE_STATE)
     print(read())
