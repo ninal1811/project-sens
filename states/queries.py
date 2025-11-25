@@ -43,6 +43,26 @@ def load_cache():
     for state in states:
         cache[(state[CODE], state[COUNTRY_CODE])] = state
 
+@needs_cache
+def create(flds: dict, reload=True) -> str:
+    if not isinstance(flds, dict):
+        raise ValueError(f'Bad type for {type(flds)=}')
+    code = flds.get(CODE)
+    country_code = flds.get(COUNTRY_CODE)
+    if not flds.get(NAME):
+        raise ValueError(f'Bad value for {flds.get(NAME)=}')
+    if not code:
+        raise ValueError(f'Bad value for {code=}')
+    if not country_code:
+        raise ValueError(f'Bad value for {country_code=}')
+    if (code, country_code) in cache:
+        raise ValueError(f'Duplicate key: {code=}; {country_code=}')
+    new_id = dbc.create(STATE_COLLECTION, flds)
+    print(f'{new_id=}')
+    if reload:
+        load_cache()
+    return new_id
+
 def main():
     create(SAMPLE_STATE)
     print(read())
