@@ -63,6 +63,29 @@ def create(flds: dict, reload=True) -> str:
         load_cache()
     return new_id
 
+def delete(code: str, cntry_code: str) -> bool:
+    ret = dbc.delete(STATE_COLLECTION, {CODE: code, COUNTRY_CODE: cntry_code})
+    if ret < 1:
+        raise ValueError(f'State not found: {code}, {cntry_code}')
+    load_cache()
+    return ret
+
+def update(code: str, country_code: str, updates: dict) -> bool:
+    if not updates:
+        raise ValueError("update fields not provided")
+
+    result = dbc.update(
+        STATE_COLLECTION,
+        {CODE: code, COUNTRY_CODE: country_code},
+        updates
+    )
+
+    if result < 1:
+        raise ValueError(f"state not found: {code}, {country_code}")
+
+    load_cache()
+    return result
+
 def main():
     create(SAMPLE_STATE)
     print(read())
