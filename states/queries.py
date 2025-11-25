@@ -1,7 +1,7 @@
 from functools import wraps
 
 import data.db_connect as dbc
-from data.db_connect import is_valid_id
+from data.db_connect import is_valid_id  # noqa: F401
 
 STATE_COLLECTION = 'states'
 ID = 'id'
@@ -20,6 +20,7 @@ SAMPLE_STATE = {
 
 cache = None
 
+
 def needs_cache(fn, *args, **kwargs):
     @wraps(fn)
     def wrapper(*args, **kwargs):
@@ -27,21 +28,28 @@ def needs_cache(fn, *args, **kwargs):
             load_cache()
         return fn(*args, **kwargs)
     return wrapper
-    
+
+
 @needs_cache
 def count():
     return len(cache)
-    
+
+
 @needs_cache
 def read():
     return cache
-    
+
+
 def load_cache():
+    """
+    Load all states from database into memory cache
+    """
     global cache
     cache = {}
     states = dbc.read(STATE_COLLECTION)
     for state in states:
         cache[(state[CODE], state[COUNTRY_CODE])] = state
+
 
 @needs_cache
 def create(flds: dict, reload=True) -> str:
@@ -63,12 +71,14 @@ def create(flds: dict, reload=True) -> str:
         load_cache()
     return new_id
 
+
 def delete(code: str, cntry_code: str) -> bool:
     ret = dbc.delete(STATE_COLLECTION, {CODE: code, COUNTRY_CODE: cntry_code})
     if ret < 1:
         raise ValueError(f'State not found: {code}, {cntry_code}')
     load_cache()
     return ret
+
 
 def update(code: str, country_code: str, updates: dict) -> bool:
     if not updates:
@@ -86,9 +96,22 @@ def update(code: str, country_code: str, updates: dict) -> bool:
     load_cache()
     return result
 
+
+@needs_cache
+def read_one(code: str, country_code: str) -> dict:
+    """
+    Get a single state by code and country code
+    """
+    key = (code, country_code)
+    if key not in cache:
+        raise ValueError(f'State not found: {code}, {country_code}')
+    return cache[key]
+
+
 def main():
     create(SAMPLE_STATE)
     print(read())
-    
+
+
 if __name__ == '__main__':
     main()
