@@ -157,6 +157,7 @@ class CityDetails(Resource):
 
 
 @api.route(f'{CITIES_EPS}/create')
+@api.route(f'{CITIES_EPS}/create')
 class CreateCity(Resource):
     def post(self):
         """
@@ -166,6 +167,9 @@ class CreateCity(Resource):
             data = request.get_json()
             if not data or 'name' not in data:
                 return {ERROR: "City name required"}, 400
+            # Add validation
+            if not isinstance(data['name'], str) or not data['name'].strip():
+                return {ERROR: "City name must be a non-empty string"}, 400
 
             result = cqry.create(data['name'], data.get('details', {}))
             return {MESSAGE: "City created", CITY_RESP: result}, 201
