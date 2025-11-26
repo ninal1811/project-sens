@@ -15,3 +15,9 @@ def test_get_country_invalid():
 
 def test_num_countries():
     assert num_countries() == len(read_all())
+
+def test_read_all_structure():
+    data = read_all()
+    assert isinstance(data, dict)
+    assert all(isinstance(cid, int) for cid in data.keys())
+    assert all(isinstance(info, dict) for info in data.values())
