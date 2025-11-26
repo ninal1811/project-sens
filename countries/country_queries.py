@@ -67,6 +67,11 @@ def get_capital_by_name(name: str) -> str:
 def num_countries() -> int:
     return len(read_all())
 
+def country_exists(name: str) -> bool:
+    if not isinstance(name, str):
+        return False
+    doc = dbc.read_one(COUNTRY_COLLECTION, {NAME: name})
+    return doc is not None
 
 def read_all() -> dict:
     docs = dbc.read(COUNTRY_COLLECTION)

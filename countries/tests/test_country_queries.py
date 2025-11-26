@@ -1,5 +1,5 @@
 import pytest
-from countries.queries import get_country, num_countries, read_all
+from country_queries import get_country, num_countries, read_all
 
 
 def test_get_country_valid():
