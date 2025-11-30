@@ -4,6 +4,22 @@ import pytest
 
 import states.queries as qry
 
+@pytest.fixture(scope='function')
+def temp_state_no_del():
+    temp_rec = get_temp_rec()
+    qry.create(get_temp_rec())
+    return temp_rec
+    
+@pytest.fixture(scope='function')
+def temp_state():
+    temp_rec = get_temp_rec()
+    new_rec_id = qry.create(get_temp_rec())
+    yield new_rec_id
+    try:
+        qry.delete(temp_rec[qry.CODE], temp_rec[qry.COUNTRY_CODE])
+    except ValueError:
+        print('The record was already deleted.')
+
 def get_temp_rec():
     return deepcopy(qry.SAMPLE_STATE)
     
