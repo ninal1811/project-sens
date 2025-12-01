@@ -4,6 +4,7 @@ The endpoint called `endpoints` will return all available endpoints.
 """
 # from http import HTTPStatus
 import cities.queries as cqry
+import countries as cntry
 
 from flask import Flask  # , request
 from flask_restx import Resource, Api  # , fields  # Namespace
@@ -175,3 +176,31 @@ class CreateCity(Resource):
             return {MESSAGE: "City created", CITY_RESP: result}, 201
         except Exception as e:
             return {ERROR: str(e)}, 500
+
+@api.route(f"{CITIES_EPS}/state/<string:state_code>")
+class CitiesByState(Resource):
+    def get(self, state_code):
+        """
+        Retrieve all cities for a specific state.
+        """
+        try:
+            cities = cqry.get_cities_by_state(state_code)
+            if not cities:
+                return {ERROR: f"No cities found for state '{state_code}'"}, 404
+            return {CITY_RESP: cities}, 200
+
+        except Exception as e:
+            return {ERROR: str(e)}, 500
+
+@api.route("/countries")
+class Countries(Resource):
+    def get(self):
+        """
+        Retrieve all countries (cached).
+        """
+        try:
+            countries = cntry.read_all()
+            return {"countries": countries}, 200
+        except Exception as e:
+            return {ERROR: str(e)}, 500
+
