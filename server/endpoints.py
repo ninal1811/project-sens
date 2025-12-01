@@ -205,4 +205,3 @@ class Countries(Resource):
             return {"countries": countries}, 200
         except Exception as e:
             return {ERROR: str(e)}, 500
-
