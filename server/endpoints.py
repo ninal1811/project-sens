@@ -158,7 +158,6 @@ class CityDetails(Resource):
 
 
 @api.route(f'{CITIES_EPS}/create')
-@api.route(f'{CITIES_EPS}/create')
 class CreateCity(Resource):
     def post(self):
         """
@@ -177,6 +176,7 @@ class CreateCity(Resource):
         except Exception as e:
             return {ERROR: str(e)}, 500
 
+
 @api.route(f"{CITIES_EPS}/state/<string:state_code>")
 class CitiesByState(Resource):
     def get(self, state_code):
@@ -186,11 +186,13 @@ class CitiesByState(Resource):
         try:
             cities = cqry.get_cities_by_state(state_code)
             if not cities:
-                return {ERROR: f"No cities found for state '{state_code}'"}, 404
+                msg = f"No cities found for state '{state_code}'"
+                return {ERROR: msg}, 404
             return {CITY_RESP: cities}, 200
 
         except Exception as e:
             return {ERROR: str(e)}, 500
+
 
 @api.route("/countries")
 class Countries(Resource):
