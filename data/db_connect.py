@@ -15,7 +15,7 @@ from pymongo.errors import (
 LOCAL = "0"
 CLOUD = "1"
 
-SENS_DB = 'sensDB'
+SENS_DB = os.getenv('MONGO_DB', 'sensDB')
 user_nm = os.getenv('MONGO_USER_NM', 'datamixmaster')
 cloud_svc = os.getenv('MONGO_HOST', 'datamixmaster.Z6rvk.mongodb.net')
 cloud_mdb = 'mongodb+srv'
