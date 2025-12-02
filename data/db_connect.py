@@ -3,6 +3,7 @@ All interaction with MongoDB should be through this file!
 We may be required to use a new database at any point.
 """
 import os
+import certifi
 from functools import wraps
 import pymongo as pm
 from pymongo.errors import (
@@ -15,12 +16,16 @@ LOCAL = "0"
 CLOUD = "1"
 
 SENS_DB = 'sensDB'
-
+user_nm = os.getenv('MONGO_USER_NM', 'datamixmaster')
+cloud_svc = os.getenv('MONGO_HOST', 'datamixmaster.Z6rvk.mongodb.net')
+cloud_mdb = 'mongodb+srv'
+db_params = 'retryWrites=false&w=majority'
 client = None
 
 MONGO_ID = '_id'
 
 MIN_ID_LEN = 4
+
 
 def is_valid_id(_id: str) -> bool:
     if not isinstance(_id, str):
@@ -28,6 +33,7 @@ def is_valid_id(_id: str) -> bool:
     if len(_id) < MIN_ID_LEN:
         return False
     return True
+
 
 def needs_db(fn, *args, **kwargs):
     @wraps(fn)
@@ -37,24 +43,26 @@ def needs_db(fn, *args, **kwargs):
         return fn(*args, **kwargs)
     return wrapper
 
+
 def handling_errors(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
         try:
             return fn(*args, **kwargs)
         except ConnectionFailure as e:
-            print("MongoDB connection failed")
+            print(f"MongoDB connection failed: {e}")
             raise
         except ServerSelectionTimeoutError as e:
-            print("MongoDB server selection timeout")
+            print(f"MongoDB server selection timeout: {e}")
             raise
         except PyMongoError as e:
-            print("MongoDB error")
+            print(f"MongoDB error: {e}")
             raise
         except Exception as e:
-            print("Unexpected error")
+            print(f"Unexpected error: {e}")
             raise
     return wrapper
+
 
 @handling_errors
 def connect_db():
@@ -71,10 +79,9 @@ def connect_db():
         if os.environ.get('CLOUD_MONGO', LOCAL) == CLOUD:
             password = os.environ.get('MONGO_PASSWD')
             if not password:
-                raise ValueError('You must set your password '
-                                 + 'to use Mongo in the cloud.')
+                raise ValueError('You must set your password ' + 'to use Mongo in the cloud.')
             print('Connecting to Mongo in the cloud.')
-            client = pm.MongoClient(f"mongodb+srv://suha_hoque:{password}@cluster0.dsx6edq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0")
+            client = pm.MongoClient(f'{cloud_mdb}://{user_nm}:{password}' + f'@{cloud_svc}/' + f'?{db_params}', tlsCAFile=certifi.where())
         else:
             print("Connecting to Mongo locally.")
             client = pm.MongoClient()
@@ -86,6 +93,7 @@ def convert_mongo_id(doc: dict):
         # Convert mongo ID to a string so it works as JSON
         doc[MONGO_ID] = str(doc[MONGO_ID])
 
+
 @needs_db
 @handling_errors
 def create(collection, doc, db=SENS_DB):
@@ -94,6 +102,7 @@ def create(collection, doc, db=SENS_DB):
     """
     print(f'{db=}')
     return client[db][collection].insert_one(doc)
+
 
 @needs_db
 @handling_errors
@@ -106,6 +115,7 @@ def read_one(collection, filt, db=SENS_DB):
         convert_mongo_id(doc)
         return doc
 
+
 @needs_db
 @handling_errors
 def delete(collection: str, filt: dict, db=SENS_DB):
@@ -116,10 +126,12 @@ def delete(collection: str, filt: dict, db=SENS_DB):
     del_result = client[db][collection].delete_one(filt)
     return del_result.deleted_count
 
+
 @needs_db
 @handling_errors
 def update(collection, filters, update_dict, db=SENS_DB):
     return client[db][collection].update_one(filters, {'$set': update_dict})
+
 
 @needs_db
 @handling_errors
@@ -136,6 +148,7 @@ def read(collection, db=SENS_DB, no_id=True) -> list:
         ret.append(doc)
     return ret
 
+
 @needs_db
 @handling_errors
 def read_dict(collection, key, db=SENS_DB, no_id=True) -> dict:
@@ -144,6 +157,7 @@ def read_dict(collection, key, db=SENS_DB, no_id=True) -> dict:
     for rec in recs:
         recs_as_dict[rec[key]] = rec
     return recs_as_dict
+
 
 @needs_db
 @handling_errors
