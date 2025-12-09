@@ -36,10 +36,21 @@ def test_good_create():
     assert qry.count() == old_count + 1
     qry.delete(qry.SAMPLE_CODE, qry.SAMPLE_COUNTRY)
     
+def test_create_dup_key():
+    qry.create(get_temp_rec())
+    with pytest.raises(ValueError):
+        qry.create(get_temp_rec())
+    qry.delete(qry.SAMPLE_CODE, qry.SAMPLE_COUNTRY)
+    
 def test_create_bad_name():
-    with pytest.raise(ValueError):
+    with pytest.raises(ValueError):
         qry.create({})
         
 def test_create_bad_param_type():
-    with pytest.raise(ValueError):
+    with pytest.raises(ValueError):
         qry.create(17)
+
+def test_read(temp_state):
+    states = qry.read()
+    assert isinstance(states, dict)
+    assert qry.SAMPLE_KEY in states
