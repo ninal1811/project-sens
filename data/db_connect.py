@@ -26,6 +26,22 @@ MONGO_ID = '_id'
 
 MIN_ID_LEN = 4
 
+# parameter names of mongo client settings
+SERVER_API_PARAM ='server_api'
+CONN_TIMEOUT = 'connectTimeoutMS'
+SOCK_TIMEOUT = 'socketTimeoutMS'
+CONNECT = 'connect'
+MAX_POOL_SIZE = 'maxPoolSize'
+
+# reccomended pythoneverywhere settings
+PA_MONGO = os.getenv('PA_MONGO0', True)
+PA_SETTINGS = {
+    CONN_TIMEOUT: os.getenv('MONGO_CONN_TIMEOUT',30000),
+    SOCK_TIMEOUT: os.getenv("MONGO_SOCK_TIMEOUT", None),
+    CONNECT: os.getenv('MONGO_CONNECT', False),
+    MAX_POOL_SIZE: os.getenv('MONGO_MAX_POOL_SIZE', 1),
+}
+
 
 def is_valid_id(_id: str) -> bool:
     if not isinstance(_id, str):
@@ -81,7 +97,7 @@ def connect_db():
             if not password:
                 raise ValueError('You must set your password ' + 'to use Mongo in the cloud.')
             print('Connecting to Mongo in the cloud.')
-            client = pm.MongoClient(f'{cloud_mdb}://{user_nm}:{password}' + f'@{cloud_svc}/' + f'?{db_params}', tlsCAFile=certifi.where())
+            client = pm.MongoClient(f'{cloud_mdb}://{user_nm}:{password}' + f'@{cloud_svc}/' + f'?{db_params}', tlsCAFile=certifi.where(), **PA_SETTINGS)
         else:
             print("Connecting to Mongo locally.")
             client = pm.MongoClient()
