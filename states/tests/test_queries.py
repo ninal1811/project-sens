@@ -35,3 +35,11 @@ def test_good_create():
     assert qry.is_valid_id(new_rec_id)
     assert qry.count() == old_count + 1
     qry.delete(qry.SAMPLE_CODE, qry.SAMPLE_COUNTRY)
+    
+def test_create_bad_name():
+    with pytest.raise(ValueError):
+        qry.create({})
+        
+def test_create_bad_param_type():
+    with pytest.raise(ValueError):
+        qry.create(17)
