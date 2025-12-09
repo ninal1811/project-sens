@@ -27,7 +27,7 @@ MONGO_ID = '_id'
 MIN_ID_LEN = 4
 
 # parameter names of mongo client settings
-SERVER_API_PARAM ='server_api'
+SERVER_API_PARAM = 'server_api'
 CONN_TIMEOUT = 'connectTimeoutMS'
 SOCK_TIMEOUT = 'socketTimeoutMS'
 CONNECT = 'connect'
@@ -36,7 +36,7 @@ MAX_POOL_SIZE = 'maxPoolSize'
 # reccomended pythoneverywhere settings
 PA_MONGO = os.getenv('PA_MONGO0', True)
 PA_SETTINGS = {
-    CONN_TIMEOUT: os.getenv('MONGO_CONN_TIMEOUT',30000),
+    CONN_TIMEOUT: os.getenv('MONGO_CONN_TIMEOUT', 30000),
     SOCK_TIMEOUT: os.getenv("MONGO_SOCK_TIMEOUT", None),
     CONNECT: os.getenv('MONGO_CONNECT', False),
     MAX_POOL_SIZE: os.getenv('MONGO_MAX_POOL_SIZE', 1),
