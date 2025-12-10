@@ -54,3 +54,18 @@ def test_read(temp_state):
     states = qry.read()
     assert isinstance(states, dict)
     assert qry.SAMPLE_KEY in states
+
+@pytest.mark.skip('This is an example of a bad test!')
+def test_bad_test_for_count():
+    assert qry.count() == len(qry.cache)
+
+
+def test_delete(temp_state_no_del):
+    ret = qry.delete(temp_state_no_del[qry.CODE],
+                     temp_state_no_del[qry.COUNTRY_CODE])
+    assert ret == 1
+
+
+def test_delete_not_there():
+    with pytest.raises(ValueError):
+        qry.delete('some state code that is not there', 'not a country code')
