@@ -5,6 +5,7 @@ The endpoint called `endpoints` will return all available endpoints.
 # from http import HTTPStatus
 import cities.queries as cqry
 import countries as cntry
+import states.queries as sqry
 
 from flask import Flask  # , request
 from flask_restx import Resource, Api  # , fields  # Namespace
@@ -26,6 +27,9 @@ ENDPOINT_RESP = "Available endpoints"
 HELLO_EP = "/hello"
 HELLO_RESP = "hello"
 MESSAGE = "Message"
+
+STATES_EPS = "/states"
+STATE_RESP = "States"
 
 CITIES_EPS = "/cities"
 CITY_RESP = "Cities"
