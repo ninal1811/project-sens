@@ -205,3 +205,84 @@ class Countries(Resource):
             return {"countries": countries}, 200
         except Exception as e:
             return {ERROR: str(e)}, 500
+
+
+@api.route(f"{STATES_EPS}/{READ}")
+class States(Resource):
+    """
+    Retrieve all states from the states cache or database.
+    """
+
+    def get(self):
+        """
+        Return a list of all stored states.
+        """
+        try:
+            # sqry.read() returns a dict keyed by (code, country_code),
+            # so we just return the values as a list of state records.
+            states = sqry.read()
+            return {STATE_RESP: list(states.values())}, 200
+        except ConnectionError as e:
+            return {ERROR: str(e)}, 500
+
+
+@api.route(f"{STATES_EPS}/count")
+class StateCount(Resource):
+    """
+    Return the total number of states currently stored.
+    """
+
+    def get(self):
+        """
+        Return the number of state records.
+        """
+        try:
+            count = sqry.count()
+            return {"count": count}, 200
+        except ConnectionError as e:
+            return {ERROR: str(e)}, 500
+
+
+@api.route(f"{STATES_EPS}/<string:state_code>/<string:country_code>")
+class StateDetails(Resource):
+    """
+    Retrieve or delete a specific state using its code and country code.
+    """
+
+    def get(self, state_code, country_code):
+        """
+        Retrieve details for a single state by code and country code.
+        """
+        try:
+            state = sqry.read_one(state_code, country_code)
+            return {
+                STATE_RESP: {
+                    "code": state_code,
+                    "country_code": country_code,
+                    "details": state,
+                }
+            }, 200
+        except ValueError:
+            return {ERROR: f"State '{state_code}', '{country_code}' not found"}, 404
+        except ConnectionError as e:
+            return {ERROR: str(e)}, 500
+        except Exception as e:
+            return {ERROR: str(e)}, 500
+
+    def delete(self, state_code, country_code):
+        """
+        Delete a specific state by code and country code.
+        """
+        try:
+            result = sqry.delete(state_code, country_code)
+            if not result:
+                return {
+                    ERROR: f"State '{state_code}', '{country_code}' not found"
+                }, 404
+            return {
+                MESSAGE: f"State '{state_code}', '{country_code}' deleted successfully"
+            }, 200
+        except ValueError:
+            return {ERROR: f"State '{state_code}', '{country_code}' not found"}, 404
+        except ConnectionError as e:
+            return {ERROR: str(e)}, 500
