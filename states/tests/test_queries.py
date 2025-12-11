@@ -69,3 +69,12 @@ def test_delete(temp_state_no_del):
 def test_delete_not_there():
     with pytest.raises(ValueError):
         qry.delete('some state code that is not there', 'not a country code')
+def test_update(temp_state):
+    code = qry.SAMPLE_STATE[qry.CODE]
+    country = qry.SAMPLE_STATE[qry.COUNTRY_CODE]
+    updated = get_temp_rec()
+    updated[qry.NAME] = "UpdatedName"
+    ret = qry.update(code, country, updated)
+    assert ret >= 1
+    state = qry.read_one(code, country)
+    assert state[qry.NAME] == "UpdatedName"
