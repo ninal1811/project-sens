@@ -219,14 +219,22 @@ class States(Resource):
 
     def get(self):
         """
-        Return a list of all stored states.
+        Return all stored states.
         """
         try:
-            # sqry.read() returns a dict keyed by (code, country_code),
-            # so we just return the values as a list of state records.
             states = sqry.read()
-            return {STATE_RESP: list(states.values())}, 200
-        except ConnectionError as e:
+
+            # If sqry.read() returns the cache dict (like your test_queries),
+            # return the values as a list. If it already returns a list,
+            # just send it back directly.
+            if isinstance(states, dict):
+                data = list(states.values())
+            else:
+                data = states
+
+            return {STATE_RESP: data}, 200
+        except Exception as e:
+            # Catch any error and surface the message instead of a generic 500.
             return {ERROR: str(e)}, 500
 
 
