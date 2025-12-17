@@ -1,5 +1,8 @@
 import pytest
+import sys
+import os
 from unittest.mock import patch
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import country_queries
 
 
