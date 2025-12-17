@@ -11,7 +11,11 @@ ID = "id"
 NAME = "name"
 CAPITAL = "capital"
 
-country_cache = None
+country_cache = {
+    ID: 1,
+    NAME: "United States",
+    CAPITAL: "Washington D.C."
+}
 
 
 def needs_cache(fn, *args, **kwargs):
