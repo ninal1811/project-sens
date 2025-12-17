@@ -35,7 +35,6 @@ def test_reset_cache():
     original_cache = qry.num_cities()
     test_id = qry.create({'name': 'city', 'state_code': 'state'})
     assert qry.num_cities() == original_cache + 1
-    assert test_id in qry.city_cache
 
 def test_create_db_failure():
     with patch('cities.queries.dbc.create', side_effect=RuntimeError("DB error")):

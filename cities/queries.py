@@ -5,7 +5,7 @@ import data.db_connect as dbc
 MIN_ID_LEN = 1
 CITY_COLLECTION = 'cities'
 
-ID = 'id'
+ID = '_id'
 NAME = 'name'
 STATE_CODE = 'state_code'
 
@@ -31,10 +31,12 @@ def load_cache():
         if cid is not None:
             cache[cid] = doc
 
+
 SAMPLE_CITY = {
     NAME: 'New York City',
     STATE_CODE: 'NY',
 }
+
 
 # using the ID as the key
 city_cache = {
@@ -45,12 +47,12 @@ city_cache = {
     },
 }
 
+
 @needs_cache
 def get_city(city_id: str) -> dict:
     """Retrieve a city record by ID."""
     if not is_valid_id(city_id):
         raise ValueError(f"Invalid ID: {city_id}")
-    
     doc = cache.get(city_id)
     if doc is None:
         doc = dbc.read_one(CITY_COLLECTION, {ID: city_id})
@@ -59,18 +61,19 @@ def get_city(city_id: str) -> dict:
         cache[city_id] = doc
     return doc
 
+
 @needs_cache
 def get_cities_by_state(state_code: str) -> dict:
     """Retrieve all cities that match the given state code"""
     if not isinstance(state_code, str) or not state_code:
         raise ValueError(f'Bad state code: {state_code}')
-    
-    cities = dbc.read(CITY_COLLECTION)  # returns a list of docs
+    cities = dbc.read(CITY_COLLECTION, no_id=False)  # returns a list of docs
     return {
         city[ID]: city
         for city in cities
         if city.get(STATE_CODE) == state_code
     }
+
 
 def delete(name: str, state_code: str) -> bool:
     ret = dbc.delete(CITY_COLLECTION, {NAME: name, STATE_CODE: state_code})
@@ -79,17 +82,18 @@ def delete(name: str, state_code: str) -> bool:
     load_cache()
     return ret
 
+
 def update_city(city_id: str, new_data: dict) -> bool:
     if not is_valid_id(city_id):
         raise ValueError(f"Invalid ID: {city_id}")
     if not new_data:
         raise ValueError("No update data provided.")
-    
     ret = dbc.update(CITY_COLLECTION, {ID: city_id}, new_data)
     if ret < 1:
         raise ValueError(f"No city found to update: {city_id}")
     load_cache()
     return True
+
 
 def create(data: dict) -> str:
     print(f'{data=}')
@@ -100,12 +104,14 @@ def create(data: dict) -> str:
     new_id = dbc.create(CITY_COLLECTION, data)
     print(f'{new_id=}')
     load_cache()
-    return new_id
+    return str(new_id.inserted_id)
+
 
 @needs_cache
 def num_cities() -> int:
     return len(read())
-    
+
+
 def is_valid_id(_id: str) -> bool:
     if not isinstance(_id, str):
         return False
@@ -113,9 +119,11 @@ def is_valid_id(_id: str) -> bool:
         return False
     return True
 
+
 @needs_cache
 def read() -> dict:
     return dbc.read(CITY_COLLECTION)
+
 
 def main():
     print(read())
@@ -126,6 +134,5 @@ def main():
         print(f"Error: {e}")
 
 
-if __name__=='__main__':
+if __name__ == '__main__':
     main()
-
