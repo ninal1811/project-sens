@@ -20,7 +20,6 @@ def needs_cache(fn, *args, **kwargs):
     """
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        global country_cache
         if country_cache is None:
             load_cache()
         return fn(*args, **kwargs)
