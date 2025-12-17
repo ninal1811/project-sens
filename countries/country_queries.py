@@ -7,15 +7,11 @@ logging.basicConfig(level=logging.INFO)
 MIN_ID_LEN = 1
 COUNTRY_COLLECTION = "countries"
 
-ID = "id"
+ID = "_id"
 NAME = "name"
 CAPITAL = "capital"
 
-country_cache = {
-    ID: 1,
-    NAME: "United States",
-    CAPITAL: "Washington D.C."
-}
+country_cache = None
 
 
 def needs_cache(fn, *args, **kwargs):
@@ -24,6 +20,7 @@ def needs_cache(fn, *args, **kwargs):
     """
     @wraps(fn)
     def wrapper(*args, **kwargs):
+        global country_cache
         if country_cache is None:
             load_cache()
         return fn(*args, **kwargs)
