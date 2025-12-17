@@ -13,6 +13,7 @@ CAPITAL = "capital"
 
 country_cache = None
 
+
 def needs_cache(fn, *args, **kwargs):
     """
     Ensure the country cache is loaded before calling fn.
@@ -38,6 +39,7 @@ def load_cache() -> None:
         if cid is not None:
             country_cache[cid] = doc
 
+
 def add_country(country_id: int, name: str, capital: str) -> None:
     doc = {
         ID: country_id,
@@ -48,6 +50,7 @@ def add_country(country_id: int, name: str, capital: str) -> None:
     if result.matched_count == 0:
         dbc.create(COUNTRY_COLLECTION, doc)
     load_cache()
+
 
 @needs_cache
 def get_country(country_id: int) -> dict:
@@ -64,26 +67,27 @@ def get_country(country_id: int) -> dict:
 
     return doc
 
+
 @needs_cache
 def search_country(keyword: str) -> dict:
     if not keyword:
         raise ValueError("Keyword must not be empty.")
     keyword_lower = keyword.lower()
-    all_countries = read_all()  # dict keyed by ID
 
     return {
         cid: c
         for cid, c in country_cache.items()
-        if isinstance(c.get(NAME), str)
-        and keyword_lower in c[NAME].lower()
+        if isinstance(c.get(NAME), str) and keyword_lower in c[NAME].lower()
     }
+
 
 def delete_country(country_id: int) -> bool:
     result = dbc.delete(COUNTRY_COLLECTION, {ID: country_id})
     if result < 1:
         raise ValueError(f"Country with id {country_id} not found.")
-   load_cache() 
-   return True
+    load_cache()
+    return True
+
 
 @needs_cache
 def get_capital_by_name(name: str) -> str:
@@ -92,9 +96,11 @@ def get_capital_by_name(name: str) -> str:
             return doc[CAPITAL]
     raise ValueError(f"No country found with name {name}")
 
+
 @needs_cache
 def num_countries() -> int:
     return len(country_cache)
+
 
 @needs_cache
 def country_exists(name: str) -> bool:
@@ -102,13 +108,16 @@ def country_exists(name: str) -> bool:
         return False
     return any(doc.get(NAME) == name for doc in country_cache.values())
 
+
 def read_all() -> dict:
     return country_cache
+
 
 def is_valid_capital(capital: str) -> bool:
     if not isinstance(capital, str):
         logging.error("Invalid type for capital. Capital should be a string.")
         return False
+
 
 def is_valid_id(_id: str) -> bool:
     if not isinstance(_id, str):
@@ -116,4 +125,3 @@ def is_valid_id(_id: str) -> bool:
     if len(_id) < MIN_ID_LEN:
         return False
     return True
-
