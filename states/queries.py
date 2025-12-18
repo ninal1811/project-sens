@@ -69,7 +69,7 @@ def create(flds: dict, reload=True) -> str:
     print(f'{new_id=}')
     if reload:
         load_cache()
-    return new_id
+    return str(new_id.inserted_id)
 
 
 def delete(code: str, cntry_code: str) -> bool:
@@ -90,11 +90,11 @@ def update(code: str, country_code: str, updates: dict) -> bool:
         updates
     )
 
-    if result < 1:
+    if result.modified_count < 1:
         raise ValueError(f"state not found: {code}, {country_code}")
 
     load_cache()
-    return result
+    return result.modified_count
 
 
 @needs_cache
