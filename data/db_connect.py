@@ -100,7 +100,7 @@ def connect_db():
             client = pm.MongoClient(f'{cloud_mdb}://{user_nm}:{password}' + f'@{cloud_svc}/' + f'?{db_params}', tlsCAFile=certifi.where(), **PA_SETTINGS)
         else:
             print("Connecting to Mongo locally.")
-            client = pm.MongoClient("mongodb://localhost:27018/")
+            client = pm.MongoClient("mongodb://localhost:27017/")
     return client
 
 
