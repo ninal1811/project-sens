@@ -4,6 +4,18 @@ import pytest
 
 import states.queries as qry
 
+@pytest.fixture(autouse=True)
+def reset_cache_and_cleanup():
+    """Reset cache before each test and clean up NY state if it exists"""
+    qry.cache = None
+    # Clean up any leftover NY state from previous test runs
+    try:
+        qry.delete(qry.SAMPLE_CODE, qry.SAMPLE_COUNTRY)
+    except (ValueError, KeyError):
+        pass  # State doesn't exist, that's fine
+    yield
+    qry.cache = None
+
 @pytest.fixture(scope='function')
 def temp_state_no_del():
     temp_rec = get_temp_rec()
