@@ -4,7 +4,7 @@ The endpoint called `endpoints` will return all available endpoints.
 """
 # from http import HTTPStatus
 import cities.queries as cqry
-import countries as cntry
+import countries.country_queries as cntry
 import states.queries as sqry
 
 from flask import Flask  # , request

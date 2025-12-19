@@ -107,7 +107,7 @@ def country_exists(name: str) -> bool:
         return False
     return any(doc.get(NAME) == name for doc in country_cache.values())
 
-
+@needs_cache
 def read_all() -> dict:
     return country_cache
 
