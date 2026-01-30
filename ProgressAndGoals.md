@@ -63,5 +63,9 @@ Purpose:
 Purpose: 
 
 ## Work on the security
+- Add parameterized queries to prevent NoSQL injection attacks in MongoDB operations.
+- Add rate limiting to API endpoints to prevent abuse and DoS attacks.
+- Store API endpoints and configuration in environment variables, never hardcode in source.
+- Add security-focused unit tests using React Testing Library for input handling.
 
-Purpose: 
+Purpose: Ensure the geographic and food data API is secure, resilient, and safe for public-facing use by implementing industry-standard backend, database, and deployment security controls.
