@@ -5,8 +5,7 @@
 The following lists what was completed during the Fall 2025 semester.
 
 - Created an API server for geographical data.
-- Implemented CRUD operations for related datasets, which includes countries, states, and cities.
-- Implemented more than 12 API endpoints (get exact count and endpoint names).
+- Implemented 14 API endpoints including CRUD operations for cities and states, country retrieval, health checks, and utility endpoints (`/cities/create`, `/countries`, `/states/read`, `/health`, etc).
 - Each endpoint includes corresponding unit tests.
 - All endpoints are documented using Swagger.
 - Relevant data is cached to improve performance.
@@ -46,13 +45,18 @@ Purpose: Allows backend data to be better visualized.
 - Find additional geographic data from Kaggle.
 - Create ETL scripts to load geographic data into MongoDB.
 - Note: For countries that have provinces, we will count the provinces as states.
-- Note: Our Geographic regions will be:
+- Note: Our Geographic regions will be: North America, Africa, and Asia
 
-Purpose: 
+Purpose: Expand the geographic database to provide comprehensive coverage across multiple regions, enabling richer data exploration and more meaningful food-by-region associations.
 
 ## Load data related to popular food by region
 
-Purpose: 
+- Source food data from reliable databases 
+- Define schema for food data including fields like food name, region/country association, description, and category.
+- Create ETL scripts to process and load food data into MongoDB.
+- Link food entries to existing geographic entities (countries, states, cities).
+
+Purpose: Enrich the dataset with culturally relevant food information, creating the foundation for users to discover and explore regional cuisines alongside geographic data.
 
 ## Work on the backend API Server to process data related to food (add queries, tests, etc)
 
@@ -60,12 +64,12 @@ Purpose:
 - Implement query functionality for filtering by region or country.
 - Add unit tests for all new endpoints.
 
-Purpose: 
+Purpose: Extend the API's capabilities to handle food-related queries efficiently, ensuring reliable data retrieval and maintaining code quality through comprehensive testing.
 
 ## Work on the security
 - Add parameterized queries to prevent NoSQL injection attacks in MongoDB operations.
 - Add rate limiting to API endpoints to prevent abuse and DoS attacks.
-- Store API endpoints and configuration in environment variables, never hardcode in source.
+- Store API keys and configuration in environment variables, never hardcode in source.
 - Add security-focused unit tests using React Testing Library for input handling.
 
 Purpose: Ensure the geographic and food data API is secure, resilient, and safe for public-facing use by implementing industry-standard backend, database, and deployment security controls.
