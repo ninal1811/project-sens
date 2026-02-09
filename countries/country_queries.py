@@ -4,7 +4,7 @@ import data.db_connect as dbc
 import logging
 logging.basicConfig(level=logging.INFO)
 
-MIN_ID_LEN = 3 #ISO-3 Country Code
+MIN_ID_LEN = 3  # ISO-3 Country Code
 COUNTRY_COLLECTION = "countries"
 
 ID = "_id"
@@ -35,25 +35,28 @@ def load_cache() -> None:
     """
     global country_cache
     country_cache = {}
-    docs = dbc.read(COUNTRY_COLLECTION)
+
+    print(f"DEBUG: Loading cache from collection '{COUNTRY_COLLECTION}'")
+    docs = dbc.read(COUNTRY_COLLECTION, no_id=False)
+    print(f"DEBUG: Retrieved {len(docs)} documents")
     for doc in docs:
+        print(f"DEBUG: Processing doc: {doc.get(ID)}")
         cid = doc.get(ID)
         if cid is not None:
             country_cache[cid] = doc
+    print(f"DEBUG: Cache now has {len(country_cache)} countries")
 
 
-def add_country(country_id: str, name: str, capital: str,
-                nat_dish: str, pop_dish_1: str, pop_dish_2: str) -> None:
-    if not is_valid_id:
-        raise ValueError("Invalid country code.")
-    
+def add_country(country_id: str, name: str, capital: str, **extra_fields) -> None:
+    """
+    Add or update a country with all its fields.
+    extra_fields can include: nat_dish, pop_dish_1, pop_dish_2, etc.
+    """
     doc = {
         ID: country_id,
         NAME: name,
         CAPITAL: capital,
-        NATIONAL_DISH: nat_dish,
-        POP_DISH_1: pop_dish_1,
-        POP_DISH_2: pop_dish_2
+        **extra_fields  # This adds any additional fields like nat_dish, pop_dish_1, etc.
     }
     result = dbc.update(COUNTRY_COLLECTION, {ID: country_id}, doc)
     if result.matched_count == 0:
@@ -133,7 +136,7 @@ def is_valid_id(_id: str) -> bool:
     if not isinstance(_id, str):
         return False
     _id = _id.strip().upper()
-    if len(_id) !=  MIN_ID_LEN:
+    if len(_id) != MIN_ID_LEN:
         return False
     if not _id.isalpha():
         return False
