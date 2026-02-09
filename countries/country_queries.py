@@ -4,7 +4,7 @@ import data.db_connect as dbc
 import logging
 logging.basicConfig(level=logging.INFO)
 
-MIN_ID_LEN = 1
+MIN_ID_LEN = 3 #ISO-3 Country Code
 COUNTRY_COLLECTION = "countries"
 
 ID = "_id"
@@ -14,7 +14,7 @@ CAPITAL = "capital"
 country_cache = None
 
 
-def needs_cache(fn, *args, **kwargs):
+def needs_cache(fn):
     """
     Ensure the country cache is loaded before calling fn.
     """
@@ -39,7 +39,10 @@ def load_cache() -> None:
             country_cache[cid] = doc
 
 
-def add_country(country_id: int, name: str, capital: str) -> None:
+def add_country(country_id: str, name: str, capital: str) -> None:
+    if not is_valid_id:
+        raise ValueError("Invalid country code.")
+    
     doc = {
         ID: country_id,
         NAME: name,
@@ -52,7 +55,7 @@ def add_country(country_id: int, name: str, capital: str) -> None:
 
 
 @needs_cache
-def get_country(country_id: int) -> dict:
+def get_country(country_id: str) -> dict:
     """Retrieve a country by ID."""
     logging.info(f"Fetching country with ID: {country_id}")
     doc = country_cache.get(country_id)
@@ -80,7 +83,7 @@ def search_country(keyword: str) -> dict:
     }
 
 
-def delete_country(country_id: int) -> bool:
+def delete_country(country_id: str) -> bool:
     result = dbc.delete(COUNTRY_COLLECTION, {ID: country_id})
     if result < 1:
         raise ValueError(f"Country with id {country_id} not found.")
@@ -122,6 +125,9 @@ def is_valid_capital(capital: str) -> bool:
 def is_valid_id(_id: str) -> bool:
     if not isinstance(_id, str):
         return False
-    if len(_id) < MIN_ID_LEN:
+    _id = _id.strip().upper()
+    if len(_id) !=  MIN_ID_LEN:
+        return False
+    if not _id.isalpha():
         return False
     return True
