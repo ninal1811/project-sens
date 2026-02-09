@@ -1,0 +1,39 @@
+country_code,state_code,name
+USA,MA,massachusetts
+USA,NY,new york
+USA,PA,pennsylvania
+USA,ME,maine
+USA,GA,georgia
+USA,SC,south carolina
+BGD,BD-A,Barishal
+BGD,BD-B,Chattogram
+BGD,BD-C,Dhaka
+BGD,BD-D,Khulna
+BGD,BD-H,Mymensingh
+BGD,BD-E,Rajshahi
+BGD,BD-F,Rangpur
+BGD,BD-G,Sylhet
+PHL,LUZ,Luzon
+PHL,VIS,Visayas
+PHL,MIN,Mindanao
+IND,AP,Andhra Pradesh
+IND,KA,Karnataka
+IND,KL,Kerala
+IND,TN,Tamil Nadu
+IND,TG,Telangana
+MEX,MEX,Mexico
+MEX,PUE,Puebla
+MEX,JAL,Jalisco
+MEX,OAX,Oaxaca
+MAR,TTA,Tanger-Tétouan-Al Hoceïma
+MAR,ORI,L'Oriental
+MAR,FEM,Fès-Meknès
+MAR,RSK,Rabat-Salé-Kénitra
+MAR,BMK,Béni Mellal-Khénifra
+MAR,CAS,Casablanca-Settat
+MAR,MAS,Marrakech-Safi
+MAR,DRT,Drâa-Tafilalet
+MAR,SOM,Souss-Massa
+MAR,GON,Guelmim-Oued Noun
+MAR,LSH,Laâyoune-Sakia El Hamra
+MAR,DOD,Dakhla-Oued Ed-Dahab
