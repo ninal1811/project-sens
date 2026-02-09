@@ -4,9 +4,8 @@ import data.db_connect as dbc
 from data.db_connect import is_valid_id  # noqa: F401
 
 STATE_COLLECTION = 'states'
-ID = 'id'
 NAME = 'name'
-CODE = 'code'
+STATE_CODE = 'state_code'
 COUNTRY_CODE = 'country_code'
 
 SAMPLE_CODE = 'NY'
@@ -14,14 +13,14 @@ SAMPLE_COUNTRY = 'USA'
 SAMPLE_KEY = (SAMPLE_CODE, SAMPLE_COUNTRY)
 SAMPLE_STATE = {
     NAME: 'New York',
-    CODE: SAMPLE_CODE,
+    STATE_CODE: SAMPLE_CODE,
     COUNTRY_CODE: SAMPLE_COUNTRY
 }
 
 cache = None
 
 
-def needs_cache(fn, *args, **kwargs):
+def needs_cache(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
         if not cache:
@@ -48,14 +47,14 @@ def load_cache():
     cache = {}
     states = dbc.read(STATE_COLLECTION)
     for state in states:
-        cache[(state[CODE], state[COUNTRY_CODE])] = state
+        cache[(state[STATE_CODE], state[COUNTRY_CODE])] = state
 
 
 @needs_cache
 def create(flds: dict, reload=True) -> str:
     if not isinstance(flds, dict):
         raise ValueError(f'Bad type for {type(flds)=}')
-    code = flds.get(CODE)
+    code = flds.get(STATE_CODE)
     country_code = flds.get(COUNTRY_CODE)
     if not flds.get(NAME):
         raise ValueError(f'Bad value for {flds.get(NAME)=}')
@@ -73,7 +72,7 @@ def create(flds: dict, reload=True) -> str:
 
 
 def delete(code: str, cntry_code: str) -> bool:
-    ret = dbc.delete(STATE_COLLECTION, {CODE: code, COUNTRY_CODE: cntry_code})
+    ret = dbc.delete(STATE_COLLECTION, {STATE_CODE: code, COUNTRY_CODE: cntry_code})
     if ret < 1:
         raise ValueError(f'State not found: {code}, {cntry_code}')
     load_cache()
@@ -86,7 +85,7 @@ def update(code: str, country_code: str, updates: dict) -> bool:
 
     result = dbc.update(
         STATE_COLLECTION,
-        {CODE: code, COUNTRY_CODE: country_code},
+        {STATE_CODE: code, COUNTRY_CODE: country_code},
         updates
     )
 

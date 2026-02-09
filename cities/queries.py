@@ -2,17 +2,17 @@ from functools import wraps
 
 import data.db_connect as dbc
 
-MIN_ID_LEN = 1
 CITY_COLLECTION = 'cities'
 
-ID = '_id'
-NAME = 'name'
+CITY= 'city'
 STATE_CODE = 'state_code'
+COUNTRY_CODE = 'country_code'
+REC_RESTAURANT = 'rec_restaurant'
 
 cache = None
 
 
-def needs_cache(fn, *args, **kwargs):
+def needs_cache(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
         if cache is None:
@@ -24,15 +24,14 @@ def needs_cache(fn, *args, **kwargs):
 def load_cache():
     global cache
     cache = {}
-    docs = dbc.read(CITY_COLLECTION)
-    for doc in docs:
-        cid = doc.get(ID)
-        if cid is not None:
-            cache[cid] = doc
+    cities = dbc.read(CITY_COLLECTION)
+    for city in cities:
+        key = (city[CITY], city[STATE_CODE], city[COUNTRY_CODE])
+        cache[key] = city
 
 
 SAMPLE_CITY = {
-    NAME: 'New York City',
+    CITY: 'New York City',
     STATE_CODE: 'NY',
 }
 
@@ -41,23 +40,23 @@ SAMPLE_CITY = {
 city_cache = {
     1: SAMPLE_CITY,
     2: {
-        NAME: 'New Orleans',
+        CITY: 'New Orleans',
         STATE_CODE: 'LA',
     },
 }
 
 
 @needs_cache
-def get_city(city_id: str) -> dict:
+def get_city(city_id: str, state_code: str, country_code: str) -> dict:
     """Retrieve a city record by ID."""
-    if not is_valid_id(city_id):
-        raise ValueError(f"Invalid ID: {city_id}")
-    doc = cache.get(city_id)
+    key = (city_id, state_code, country_code)
+    doc = cache.get(key)
     if doc is None:
-        doc = dbc.read_one(CITY_COLLECTION, {ID: city_id})
+        query = {CITY: city_id, STATE_CODE: state_code, COUNTRY_CODE: country_code}
+        doc = dbc.read_one(CITY_COLLECTION, query)
         if doc is None:
-            raise ValueError(f'City with ID {city_id} not found.')
-        cache[city_id] = doc
+            raise ValueError(f"City not found: {city_id}, {state_code}, {country_code}")
+        cache[key] = doc
     return doc
 
 
@@ -74,12 +73,13 @@ def get_cities_by_state(state_code: str) -> dict:
     }
 
 
-def delete(name: str, state_code: str) -> bool:
-    ret = dbc.delete(CITY_COLLECTION, {NAME: name, STATE_CODE: state_code})
+def delete_city(city_name: str, state_code: str, country_code: str) -> bool:
+    """Delete a city"""
+    ret = dbc.delete(CITY_COLLECTION, {CITY: city_name, STATE_CODE: state_code, COUNTRY_CODE: country_code})
     if ret < 1:
-        raise ValueError(f'City not found: {name}, {state_code}')
+        raise ValueError(f"City not found: {city_name}, {state_code}, {country_code}")
     load_cache()
-    return ret
+    return True
 
 
 def update_city(city_id: str, new_data: dict) -> bool:
@@ -87,7 +87,7 @@ def update_city(city_id: str, new_data: dict) -> bool:
         raise ValueError(f"Invalid ID: {city_id}")
     if not new_data:
         raise ValueError("No update data provided.")
-    ret = dbc.update(CITY_COLLECTION, {ID: city_id}, new_data)
+    ret = dbc.update(CITY_COLLECTION, {CITY: city_id}, new_data)
     if ret < 1:
         raise ValueError(f"No city found to update: {city_id}")
     load_cache()
@@ -98,8 +98,8 @@ def create(data: dict) -> str:
     print(f'{data=}')
     if not isinstance(data, dict):
         raise ValueError(f'Bad type for {type(data)=}')
-    if not data.get(NAME):
-        raise ValueError(f'Bad type for {data.get(NAME)=}')
+    if not data.get(CITY):
+        raise ValueError(f'Bad type for {data.get(CITY)=}')
     new_id = dbc.create(CITY_COLLECTION, data)
     print(f'{new_id=}')
     load_cache()
@@ -113,8 +113,6 @@ def num_cities() -> int:
 
 def is_valid_id(_id: str) -> bool:
     if not isinstance(_id, str):
-        return False
-    if len(_id) < MIN_ID_LEN:
         return False
     return True
 

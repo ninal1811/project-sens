@@ -10,6 +10,9 @@ COUNTRY_COLLECTION = "countries"
 ID = "_id"
 NAME = "name"
 CAPITAL = "capital"
+NATIONAL_DISH = "nat_dish"
+POP_DISH_1 = "pop_dish_1"
+POP_DISH_2 = "pop_dish_2"
 
 country_cache = None
 
@@ -39,7 +42,8 @@ def load_cache() -> None:
             country_cache[cid] = doc
 
 
-def add_country(country_id: str, name: str, capital: str) -> None:
+def add_country(country_id: str, name: str, capital: str,
+                nat_dish: str, pop_dish_1: str, pop_dish_2: str) -> None:
     if not is_valid_id:
         raise ValueError("Invalid country code.")
     
@@ -47,6 +51,9 @@ def add_country(country_id: str, name: str, capital: str) -> None:
         ID: country_id,
         NAME: name,
         CAPITAL: capital,
+        NATIONAL_DISH: nat_dish,
+        POP_DISH_1: pop_dish_1,
+        POP_DISH_2: pop_dish_2
     }
     result = dbc.update(COUNTRY_COLLECTION, {ID: country_id}, doc)
     if result.matched_count == 0:
