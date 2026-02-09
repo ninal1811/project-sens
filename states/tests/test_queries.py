@@ -28,7 +28,7 @@ def temp_state():
     new_rec_id = qry.create(get_temp_rec())
     yield new_rec_id
     try:
-        qry.delete(temp_rec[qry.CODE], temp_rec[qry.COUNTRY_CODE])
+        qry.delete(temp_rec[qry.STATE_CODE], temp_rec[qry.COUNTRY_CODE])
     except ValueError:
         print('The record was already deleted.')
 
@@ -73,7 +73,7 @@ def test_bad_test_for_count():
 
 
 def test_delete(temp_state_no_del):
-    ret = qry.delete(temp_state_no_del[qry.CODE],
+    ret = qry.delete(temp_state_no_del[qry.STATE_CODE],
                      temp_state_no_del[qry.COUNTRY_CODE])
     assert ret == 1
 
@@ -82,7 +82,7 @@ def test_delete_not_there():
     with pytest.raises(ValueError):
         qry.delete('some state code that is not there', 'not a country code')
 def test_update(temp_state):
-    code = qry.SAMPLE_STATE[qry.CODE]
+    code = qry.SAMPLE_STATE[qry.STATE_CODE]
     country = qry.SAMPLE_STATE[qry.COUNTRY_CODE]
     updated = get_temp_rec()
     updated[qry.NAME] = "UpdatedName"
