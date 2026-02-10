@@ -20,7 +20,6 @@ country_cache = None
 def needs_cache(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        global country_cache
         if country_cache is None:
             load_cache()
         return fn(*args, **kwargs)
@@ -63,7 +62,6 @@ def get_country(country_id) -> dict:
 
     country_cache[country_id] = doc
     return doc
-
 
 
 def add_country(country_id: str, name: str, capital: str, **extra_fields) -> None:
