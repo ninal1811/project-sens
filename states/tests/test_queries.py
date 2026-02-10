@@ -2,7 +2,7 @@ from copy import deepcopy
 from unittest.mock import patch
 import pytest
 
-import states.queries as qry
+import states.states_queries as qry
 
 @pytest.fixture(autouse=True)
 def reset_cache_and_cleanup():

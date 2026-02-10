@@ -51,6 +51,41 @@ def load_cache():
 
 
 @needs_cache
+def add_state(country_code: str, state_code: str, name: str, **extra_fields) -> None:
+    """
+    Upsert a state using (state_code, country_code) as the identity.
+    Does NOT require a custom _id.
+    """
+    if not isinstance(country_code, str) or not country_code.strip():
+        raise ValueError("Bad value for country_code")
+    if not isinstance(state_code, str) or not state_code.strip():
+        raise ValueError("Bad value for state_code")
+    if not isinstance(name, str) or not name.strip():
+        raise ValueError("Bad value for name")
+
+    cc = country_code.strip().upper()
+    sc = state_code.strip().upper()
+
+    doc = {
+        NAME: name,
+        STATE_CODE: sc,
+        COUNTRY_CODE: cc,
+        **extra_fields,
+    }
+
+    # update first. if no match, create
+    result = dbc.update(
+        STATE_COLLECTION,
+        {STATE_CODE: sc, COUNTRY_CODE: cc},
+        doc
+    )
+    if result.matched_count == 0:
+        dbc.create(STATE_COLLECTION, doc)
+
+    load_cache()
+
+
+@needs_cache
 def create(flds: dict, reload=True) -> str:
     if not isinstance(flds, dict):
         raise ValueError(f'Bad type for {type(flds)=}')

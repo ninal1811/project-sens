@@ -2,7 +2,7 @@ from copy import deepcopy
 from unittest.mock import patch
 import pytest
 
-import cities.queries as qry
+import cities.cities_queries as qry
 
 
 def get_temp_rec():

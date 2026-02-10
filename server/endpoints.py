@@ -3,9 +3,9 @@ This is the file containing all of the endpoints for our flask app.
 The endpoint called `endpoints` will return all available endpoints.
 """
 # from http import HTTPStatus
-import cities.queries as cqry
+import cities.cities_queries as cqry
 import countries.country_queries as cntry
-import states.queries as sqry
+import states.states_queries as sqry
 
 from flask import Flask  # , request
 from flask_restx import Resource, Api  # , fields  # Namespace
