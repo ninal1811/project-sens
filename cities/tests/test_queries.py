@@ -22,7 +22,7 @@ def temp_city():
     new_rec_id = qry.create(get_temp_rec())
     yield new_rec_id
     try:
-        qry.delete(temp_rec[qry.NAME], temp_rec[qry.STATE_CODE])
+        qry.delete_city(temp_rec[qry.CITY], temp_rec[qry.STATE_CODE], temp_rec[qry.COUNTRY_CODE])
         print(f"[DEBUG] Successfully deleted temp city ID: {new_rec_id}")
     except ValueError as e:
         print(f"[WARN] Cleanup skipped: {e}")
@@ -43,7 +43,7 @@ def temp_city():
 
 
 def test_create_db_failure():
-    with patch('cities.queries.dbc.create', side_effect=RuntimeError("DB error")):
+    with patch('cities.cities_queries.dbc.create', side_effect=RuntimeError("DB error")):
         with pytest.raises(RuntimeError):
             qry.create(qry.SAMPLE_CITY)
 
@@ -88,7 +88,7 @@ def test_read():
 
 @pytest.mark.skip('Feature pending full implementation rollout')
 def test_delete(temp_city_no_del):
-    ret = qry.delete(temp_city_no_del[qry.NAME], temp_city_no_del[qry.STATE_CODE])
+    ret = qry.delete(temp_city_no_del[qry.CITY], temp_city_no_del[qry.STATE_CODE], temp_city_no_del[qry.COUNTRY_CODE])
     assert ret == 1
 
 
@@ -104,4 +104,4 @@ def test_is_valid_id_whitespace():
 
 def test_get_cities_by_state():
     result = qry.get_cities_by_state('NY')
-    assert all(city['state_code'] == 'NY' for city in result.values())
+    assert all(qry.city['state_code'] == 'NY' for city in result.values())

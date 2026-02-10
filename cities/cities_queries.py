@@ -26,13 +26,20 @@ def load_cache():
     cache = {}
     cities = dbc.read(CITY_COLLECTION)
     for city in cities:
-        key = (city[CITY], city[STATE_CODE], city[COUNTRY_CODE])
-        cache[key] = city
+        city_name = city.get(CITY)
+        state = city.get(STATE_CODE)
+        country = city.get(COUNTRY_CODE)
+        if all([city_name, state, country]):
+            key = (city_name, state, country)
+            cache[key] = city
+        else:
+            print(f"Skipping incomplete city document: {city}")
 
 
 SAMPLE_CITY = {
     CITY: 'New York City',
     STATE_CODE: 'NY',
+    COUNTRY_CODE: 'USA',
 }
 
 
@@ -42,6 +49,7 @@ city_cache = {
     2: {
         CITY: 'New Orleans',
         STATE_CODE: 'LA',
+        COUNTRY_CODE: 'USA',
     },
 }
 
