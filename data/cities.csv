@@ -1,0 +1,65 @@
+country_code,state_code,city,rec_restaurant
+BGD,BD-A,Barishal,Zafran Restaurant Barishal
+BGD,BD-B,Chattogram,Regalo
+BGD,BD-C,Dhaka,Amrit
+BGD,BD-D,Khulna,Deshi Kitchen
+BGD,BD-H,Mymensingh,Sarinda
+BGD,BD-E,Rajshahi,Kebab House
+BGD,BD-F,Rangpur,Thikana
+BGD,BD-G,Sylhet,Panshi
+USA,MA,Boston,Carmelina's
+USA,NY,New York City,Carbone
+USA,PA,Philadelphia,Shay’s Steaks
+USA,GA,Atlanta,South City Kitchen Midtown
+SGP,SGP,Singapore,Lau Pa Sat
+JPN,JP-A,Sapporo,Picante Soup Curry
+JPN,JP-B,Sendai ,Kaku
+JPN,JP-C,Tokyo,Tsukiji Unitora Nakadori
+JPN,JP-D,Nagoya,Shirakawa Meiekiten
+JPN,JP-E,Osaka,Sushi Tani
+JPN,JP-F,Hiroshima,Taiko Udon Nakamachi Shop
+JPN,JP-G,Takamatsu,Sanuki-Udon Enya
+JPN,JP-H,Fukuoka,Musashi Kuroge Wagyu
+KOR,KR-A,Seoul,Myeongdong JangIn Dakgalbi Restaurants
+KOR,KR-B,Daegu,Dutum (두툼참숯초벌구이)
+KOR,KR-C,Busan,Mipo-jib Haeundae
+KOR,KR-D,Jeju,Baro Jokbal Bossam
+CHN,CN-A,Beijing,Siji Mingfu Roasted Duck Restaurant
+CHN,CN-B,Fuzhou,Backstreet Laohua
+CHN,CN-C,Chongqing,Chongqing Guodao Hot Pot
+CHN,CN-D,Guangzhou,Minji Food
+CHN,CN-E,Xinjiang,Ma Fenghua Xinjiang Big Plate Chicken (马风花大盘鸡·新疆菜)
+PHL,LUZ,Manila City,Aristocrat
+PHL,VIS,Cebu City,House of Lechon
+PHL,MIN,Davao City,Rekado Filipino Comfort Cuisine
+MEX,MEX,Mexico City,El Cardenal
+MEX,PUE,Puebla,El Mural de los Poblanos
+MEX,JAL,Guadelajara,La Chata
+MEX,OAX,Oaxaca de Juárez,Los Danzantes Oaxaca
+MAR,TTA,Tangier,Dar Harruch
+MAR,ORI,Oujda,Restaurant Lamaalem
+MAR,FEM,Fez,El Forno
+MAR,RSK,Rabat,Dar Rbatia
+MAR,BMK,Beni Mellal,O'darna
+MAR,CAS,Casablanca,La Grande Table Marocaine
+MAR,MAS,Marrakesh,Dar Cherifa
+MAR,DRT,Errachidia,Lune de Desert
+MAR,SOM,Agadir,La Barque Gourmande
+MAR,GON,Guelmim,Restaurant 33
+MAR,LSH,Laayoun,L'brunch
+MAR,DOD,Dakhla,Echarfaa Food
+IND,AP,Visakhapatnam,Dharani
+IND,AP,Vijayawada,Sweet Magic
+IND,AP,Tirupati,Hotel Mayura
+IND,KA,Bengaluru,Vidyarthi Bhavan
+IND,KA,Mysuru,RRR
+IND,KA,Mangaluru,Machali
+IND,KL,Kochi,Paragon
+IND,KL,Thiruvananthapuram,Villa Maya
+IND,KL,Kozhikode,Paragon
+IND,TN,Chennai,Murugan Idli Shop
+IND,TN,Coimbatore,Annapoorna
+IND,TN,Madurai,Amma Mess
+IND,TG,Hyderabad,Shah Ghouse
+IND,TG,Warangal,Shankar Vilas
+IND,TG,Khammam,Sri Krishna Vilas
