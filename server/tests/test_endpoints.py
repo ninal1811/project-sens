@@ -56,7 +56,7 @@ def test_hello():
 # Mock the DB/read function so we don't touch real data during the test
 
 
-@patch("cities.queries.read", return_value=[{"name": "NYC"}] * 10)
+@patch("cities.cities_queries.read", return_value=[{"name": "NYC"}] * 10)
 def test_cities_bad_limit_ignored_returns_200(mock_read, client):
     # Endpoint ignores bad ?limit= and still returns 200 with the full list.
     resp = client.get(f"{ep.CITIES_EPS}/{ep.READ}?limit=notanint")
@@ -67,7 +67,7 @@ def test_cities_bad_limit_ignored_returns_200(mock_read, client):
     mock_read.assert_called_once()
 
 
-@patch("cities.queries.read", return_value=[{"name": "NYC"}, {"name": "LA"}])
+@patch("cities.cities_queries.read", return_value=[{"name": "NYC"}, {"name": "LA"}])
 def test_cities_success(mock_read, client):
     resp = client.get(f"{ep.CITIES_EPS}/{ep.READ}")
     assert resp.status_code == 200
