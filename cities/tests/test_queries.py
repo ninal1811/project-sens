@@ -28,18 +28,34 @@ def temp_city():
         print(f"[WARN] Cleanup skipped: {e}")
 
 
-# @pytest.fixture
-# def reset_cache():
-#     original_cache = qry.city_cache.copy()
-#     yield
-#     qry.city_cache.clear()
-#     qry.city_cache.update(original_cache)
+@pytest.fixture
+def reset_cache():
+    original_cache = qry.cache.copy() if qry.cache else {}
+    yield
+    qry.cache = original_cache.copy() if original_cache else None
 
 
-# def test_reset_cache():
-#     original_cache = qry.num_cities()
-#     test_id = qry.create({'name': 'city', 'state_code': 'state'})
-#     assert qry.num_cities() == original_cache + 1
+def test_reset_cache():
+    original_count = qry.count()
+    
+    test_city = {
+        qry.CITY: 'ZZTEST_ResetCache_99999',
+        qry.STATE_CODE: 'NY',
+        qry.COUNTRY_CODE: 'US',
+        qry.REC_RESTAURANT: 'Test Restaurant'
+    }
+    
+    test_id = qry.create(test_city)
+    
+    assert qry.count() == original_count + 1
+    
+    qry.delete_city(
+        test_city[qry.CITY],
+        test_city[qry.STATE_CODE],
+        test_city[qry.COUNTRY_CODE]
+    )
+    
+    assert qry.count() == original_count
 
 
 def test_create_db_failure():
@@ -107,10 +123,9 @@ def test_delete(temp_city_no_del):
     assert ret == 1
 
 
-# def test_delete_not_there():
-#     with pytest.raises(ValueError):
-#         qry.delete('Some city name that is not there', 'not a state')
-
+def test_delete_not_there():
+    with pytest.raises(ValueError):
+        qry.delete('Some city name that is not there')
 
 @pytest.mark.skip(reason="Feature pending full implementation.")
 def test_is_valid_id_whitespace():
