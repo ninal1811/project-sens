@@ -1,7 +1,7 @@
 from copy import deepcopy
 from unittest.mock import patch
 import pytest
-
+from data.db_connect import is_valid_id
 import cities.cities_queries as qry
 
 
@@ -62,11 +62,26 @@ def test_num_cities(temp_city):
     assert qry.num_cities() == old_count + 1
 
 
-# def test_good_cities():
-#     old_count = qry.num_cities()
-#     new_rec_id = qry.create(get_temp_rec())
-#     assert qry.is_valid_id(new_rec_id)
-#     assert qry.num_cities() == old_count + 1
+def test_good_cities():
+    old_count = qry.count()
+    
+    temp_rec = get_temp_rec()
+    temp_rec[qry.CITY] = "ZZTEST_GoodCities_12345"
+    
+    new_rec_id = qry.create(temp_rec)
+    
+    assert is_valid_id(new_rec_id)
+    
+    assert qry.count() == old_count + 1
+    
+    qry.delete_city(
+        temp_rec[qry.CITY], 
+        temp_rec[qry.STATE_CODE], 
+        temp_rec[qry.COUNTRY_CODE]
+    )
+    
+    # Verify cleanup worked
+    assert qry.count() == old_count
 
 
 def test_create_bad_name():
@@ -104,4 +119,4 @@ def test_is_valid_id_whitespace():
 
 def test_get_cities_by_state():
     result = qry.get_cities_by_state('NY')
-    assert all(qry.city['state_code'] == 'NY' for city in result.values())
+    assert all(city['state_code'] == 'NY' for city in result.values())
