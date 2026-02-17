@@ -51,11 +51,16 @@ def load_cache():
     try:
         cities = dbc.read(CITY_COLLECTION)
     except Exception:
+        print(f"Error loading cities from DB: {Exception}")
         cities = []
 
     for city_doc in cities:
-        key = (city_doc[CITY], city_doc[STATE_CODE], city_doc[COUNTRY_CODE])
-        cache[key] = city_doc
+        city_name = city_doc.get(CITY)
+        state_code = city_doc.get(STATE_CODE, '')
+        country_code = city_doc.get(COUNTRY_CODE, '')
+        if city_name:
+            key = (city_name, state_code, country_code)
+            cache[key] = city_doc
 
 
 @needs_cache
@@ -109,6 +114,8 @@ def get_cities_by_state(state_code: str) -> dict:
 
 @needs_cache
 def get_city_by_name(city_name: str) -> dict:
+    if cache is None:
+        load_cache()
     matches = [doc for (nm, _, _), doc in cache.items() if nm == city_name]
     if not matches:
         raise ValueError(f"City not found: {city_name}")
