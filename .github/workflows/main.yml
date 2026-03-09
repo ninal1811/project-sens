@@ -14,10 +14,6 @@ on:
 
 env:
   PYTHONPATH: /home/runner/work/project-sens/project-sens/
-  CLOUD_MONGO: "1"
-  MONGO_USER_NM: ${{secrets.MONGO_USER_NM}}
-  MONGO_HOST: ${{secrets.MONGO_HOST}} 
-  MONGO_PASSWD: ${{secrets.MONGO_PASSWD}}
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -43,9 +39,9 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
 
-      # - name: Install MongoDB in a Docker container.
-      #   uses: supercharge/mongodb-github-action@1.8.0
-      
+      - name: Install MongoDB in a Docker container.
+        uses: supercharge/mongodb-github-action@1.8.0
+
       - name: Install Python packages.
         run: make dev_env
 
