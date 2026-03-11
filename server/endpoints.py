@@ -294,6 +294,64 @@ class CreateState(Resource):
             return {ERROR: f"Unexpected error: {str(e)}"}, 500
 
 
+@api.route(f"{STATES_EPS}/add")
+class AddState(Resource):
+    """
+    Add or update a state using the add_state method (upsert).
+    """
+    def post(self):
+        """
+        Add or update a state.
+        """
+        try:
+            print(f"AddState - Request data: {request.get_data(as_text=True)}")
+
+            data = request.get_json()
+            print(f"AddState - Parsed data: {data}")
+
+            if data is None:
+                return {ERROR: "Request must be JSON. Check Content-Type header is 'application/json'"}, 400
+
+            name = data.get('name')
+            country_code = data.get('country_code')
+            state_code = data.get('state_code')
+
+            missing_fields = []
+            if not name:
+                missing_fields.append('name')
+            if not state_code:
+                missing_fields.append('state_code')
+            if not country_code:
+                missing_fields.append('country_code')
+
+            if missing_fields:
+                return {
+                    ERROR: f"Missing required fields: {', '.join(missing_fields)}",
+                    "received_data": data
+                }, 400
+
+            extra_fields = {k: v for k, v in data.items() if k not in ['country_code', 'state_code', 'name']}
+
+            sqry.add_state(country_code, state_code, name, **extra_fields)
+
+            return {
+                MESSAGE: "State added/updated successfully",
+                STATE_RESP: {
+                    "state_code": state_code,
+                    "country_code": country_code,
+                    "name": name,
+                    **extra_fields
+                }
+            }, 201
+
+        except ValueError as e:
+            print(f"AddState - ValueError: {str(e)}")
+            return {ERROR: str(e)}, 400
+        except Exception as e:
+            print(f"AddState - Unexpected error: {str(e)}")
+            return {ERROR: f"Unexpected error: {str(e)}"}, 500
+
+
 @api.route(f"{STATES_EPS}/<string:state_code>/<string:country_code>")
 class StateDetails(Resource):
     """
