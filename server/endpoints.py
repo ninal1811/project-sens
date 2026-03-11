@@ -255,6 +255,45 @@ class StateCount(Resource):
             return {ERROR: str(e)}, 500
 
 
+@api.route(f"{STATES_EPS}/create")
+class CreateState(Resource):
+    """
+    Create a new state
+    """
+    def post(self):
+        """
+        Create a new state with required state name, state code, and country code.
+        """
+        try:
+            data = request.get_json()
+            if not data:
+                return {ERROR: "Request body required"}, 400
+            if 'name' not in data:
+                return {ERROR: "State name required"}, 400
+            if 'code' not in data:
+                return {ERROR: "State code required"}, 400
+            if 'country_code' not in data:
+                return {ERROR: "Country code required"}, 400
+            result_id = sqry.create(data)
+
+            return {
+                MESSAGE: "State created successfully",
+                STATE_RESP: {
+                    "name": data['name'],
+                    "code": data['code'],
+                    "country_code": data['country_code'],
+                    "id": str(result_id)
+                }
+            }, 201
+
+        except ValueError as e:
+            return {ERROR: str(e)}, 400
+        except ConnectionError as e:
+            return {ERROR: str(e)}, 500
+        except Exception as e:
+            return {ERROR: f"Unexpected error: {str(e)}"}, 500
+
+
 @api.route(f"{STATES_EPS}/<string:state_code>/<string:country_code>")
 class StateDetails(Resource):
     """
