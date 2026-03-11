@@ -274,17 +274,15 @@ class CreateState(Resource):
                 return {ERROR: "State code required"}, 400
             if 'country_code' not in data:
                 return {ERROR: "Country code required"}, 400
-            result_id = sqry.create(data)
+            result = sqry.create(
+                state_name=data['name'],
+                state_code=data['code'],
+                country_code=data['country_code']
+            )
 
-            return {
-                MESSAGE: "State created successfully",
-                STATE_RESP: {
-                    "name": data['name'],
-                    "code": data['code'],
-                    "country_code": data['country_code'],
-                    "id": str(result_id)
-                }
-            }, 201
+            result = cqry.create(data['name'], data.get('details', {}))
+
+            return {MESSAGE: "State created", STATE_RESP: result}, 201
 
         except ValueError as e:
             return {ERROR: str(e)}, 400
