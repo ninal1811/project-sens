@@ -179,6 +179,7 @@ class AddCity(Resource):
             city = data.get('city')
             country_code = data.get('country_code')
             state_code = data.get('state_code')
+            rec_restaurant = data.get('rec_restaurant')
 
             missing_fields = []
             if not city:
@@ -187,6 +188,8 @@ class AddCity(Resource):
                 missing_fields.append('state_code')
             if not country_code:
                 missing_fields.append('country_code')
+            if not rec_restaurant:
+                missing_fields.append('rec_restaurant')
 
             if missing_fields:
                 return {
@@ -194,16 +197,17 @@ class AddCity(Resource):
                     "received_data": data
                 }, 400
 
-            extra_fields = {k: v for k, v in data.items() if k not in ['country_code', 'state_code', 'city']}
+            extra_fields = {k: v for k, v in data.items() if k not in ['country_code', 'state_code', 'city', 'rec_restaurant']}
 
-            sqry.add_state(country_code, state_code, city, **extra_fields)
+            sqry.add_city(country_code, state_code, city, rec_restaurant, **extra_fields)
 
             return {
-                MESSAGE: "State added/updated successfully",
-                STATE_RESP: {
+                MESSAGE: "City added/updated successfully",
+                CITY_RESP: {
                     "state_code": state_code,
                     "country_code": country_code,
                     "city": city,
+                    "rec_restaurant": rec_restaurant,
                     **extra_fields
                 }
             }, 201
