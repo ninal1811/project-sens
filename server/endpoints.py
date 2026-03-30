@@ -161,24 +161,59 @@ class CityDetails(Resource):
             return {ERROR: str(e)}, 500
 
 
-@api.route(f'{CITIES_EPS}/create')
-class CreateCity(Resource):
+@api.route(f'{CITIES_EPS}/add')
+class AddCity(Resource):
     def post(self):
         """
-        Create a new city
+        Add or update a city.
         """
         try:
-            data = request.get_json()
-            if not data or 'name' not in data:
-                return {ERROR: "City name required"}, 400
-            # Add validation
-            if not isinstance(data['name'], str) or not data['name'].strip():
-                return {ERROR: "City name must be a non-empty string"}, 400
+            print(f"AddCity - Request data: {request.get_data(as_text=True)}")
 
-            result = cqry.create(data['name'], data.get('details', {}))
-            return {MESSAGE: "City created", CITY_RESP: result}, 201
+            data = request.get_json()
+            print(f"AddCity - Parsed data: {data}")
+
+            if data is None:
+                return {ERROR: "Request must be JSON. Check Content-Type header is 'application/json'"}, 400
+
+            city = data.get('city')
+            country_code = data.get('country_code')
+            state_code = data.get('state_code')
+
+            missing_fields = []
+            if not city:
+                missing_fields.append('city')
+            if not state_code:
+                missing_fields.append('state_code')
+            if not country_code:
+                missing_fields.append('country_code')
+
+            if missing_fields:
+                return {
+                    ERROR: f"Missing required fields: {', '.join(missing_fields)}",
+                    "received_data": data
+                }, 400
+
+            extra_fields = {k: v for k, v in data.items() if k not in ['country_code', 'state_code', 'city']}
+
+            sqry.add_state(country_code, state_code, city, **extra_fields)
+
+            return {
+                MESSAGE: "State added/updated successfully",
+                STATE_RESP: {
+                    "state_code": state_code,
+                    "country_code": country_code,
+                    "city": city,
+                    **extra_fields
+                }
+            }, 201
+
+        except ValueError as e:
+            print(f"AddCity - ValueError: {str(e)}")
+            return {ERROR: str(e)}, 400
         except Exception as e:
-            return {ERROR: str(e)}, 500
+            print(f"AddCity - Unexpected error: {str(e)}")
+            return {ERROR: f"Unexpected error: {str(e)}"}, 500
 
 
 @api.route(f"{CITIES_EPS}/state/<string:state_code>")
@@ -253,44 +288,6 @@ class StateCount(Resource):
             return {"count": count}, 200
         except ConnectionError as e:
             return {ERROR: str(e)}, 500
-
-
-@api.route(f"{STATES_EPS}/create")
-class CreateState(Resource):
-    """
-    Create a new state
-    """
-    def post(self):
-        """
-        Create a new state with required state name, state code, and country code.
-        """
-        try:
-            data = request.get_json()
-            if not data:
-                return {ERROR: "Request body required"}, 400
-            if 'name' not in data:
-                return {ERROR: "State name required"}, 400
-            if 'code' not in data:
-                return {ERROR: "State code required"}, 400
-            if 'country_code' not in data:
-                return {ERROR: "Country code required"}, 400
-            result = sqry.create(
-                state_name=data['name'],
-                state_code=data['code'],
-                country_code=data['country_code']
-            )
-
-            result = cqry.create(data['name'], data.get('details', {}))
-
-            return {MESSAGE: "State created", STATE_RESP: result}, 201
-
-        except ValueError as e:
-            return {ERROR: str(e)}, 400
-        except ConnectionError as e:
-            return {ERROR: str(e)}, 500
-        except Exception as e:
-            return {ERROR: f"Unexpected error: {str(e)}"}, 500
-
 
 @api.route(f"{STATES_EPS}/add")
 class AddState(Resource):
