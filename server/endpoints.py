@@ -293,6 +293,7 @@ class StateCount(Resource):
         except ConnectionError as e:
             return {ERROR: str(e)}, 500
 
+
 @api.route(f"{STATES_EPS}/add")
 class AddState(Resource):
     """
