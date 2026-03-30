@@ -126,41 +126,6 @@ def parse_limit(raw):
     return n
 
 
-@api.route(f'{CITIES_EPS}/<string:city_name>')
-class CityDetails(Resource):
-    """
-    Get details for a specific city
-    """
-    def get(self, city_name):
-        """
-        Retrieve details for a single city by name
-        """
-        try:
-            cities = cqry.read()
-            if city_name not in cities:
-                return {ERROR: f"City '{city_name}' not found"}, 404
-            return {
-                CITY_RESP: city_name,
-                "details": cities[city_name]
-            }, 200
-        except ConnectionError as e:
-            return {ERROR: str(e)}, 500
-        except Exception as e:
-            return {ERROR: str(e)}, 500
-
-    def delete(self, city_name):
-        """
-        Delete a specific city by name
-        """
-        try:
-            result = cqry.delete(city_name)
-            if not result:
-                return {ERROR: f"City '{city_name}' not found"}, 404
-            return {MESSAGE: f"City '{city_name}' deleted successfully"}, 200
-        except ConnectionError as e:
-            return {ERROR: str(e)}, 500
-
-
 @api.route(f'{CITIES_EPS}/add')
 class AddCity(Resource):
     def post(self):
@@ -218,6 +183,41 @@ class AddCity(Resource):
         except Exception as e:
             print(f"AddCity - Unexpected error: {str(e)}")
             return {ERROR: f"Unexpected error: {str(e)}"}, 500
+
+
+@api.route(f'{CITIES_EPS}/<string:city_name>')
+class CityDetails(Resource):
+    """
+    Get details for a specific city
+    """
+    def get(self, city_name):
+        """
+        Retrieve details for a single city by name
+        """
+        try:
+            cities = cqry.read()
+            if city_name not in cities:
+                return {ERROR: f"City '{city_name}' not found"}, 404
+            return {
+                CITY_RESP: city_name,
+                "details": cities[city_name]
+            }, 200
+        except ConnectionError as e:
+            return {ERROR: str(e)}, 500
+        except Exception as e:
+            return {ERROR: str(e)}, 500
+
+    def delete(self, city_name):
+        """
+        Delete a specific city by name
+        """
+        try:
+            result = cqry.delete(city_name)
+            if not result:
+                return {ERROR: f"City '{city_name}' not found"}, 404
+            return {MESSAGE: f"City '{city_name}' deleted successfully"}, 200
+        except ConnectionError as e:
+            return {ERROR: str(e)}, 500
 
 
 @api.route(f"{CITIES_EPS}/state/<string:state_code>")
