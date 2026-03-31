@@ -164,7 +164,7 @@ class AddCity(Resource):
 
             extra_fields = {k: v for k, v in data.items() if k not in ['country_code', 'state_code', 'city', 'rec_restaurant']}
 
-            sqry.add_city(country_code, state_code, city, rec_restaurant, **extra_fields)
+            cqry.add_city(country_code, state_code, city, rec_restaurant, **extra_fields)
 
             return {
                 MESSAGE: "City added/updated successfully",
