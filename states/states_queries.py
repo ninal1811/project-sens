@@ -142,6 +142,20 @@ def read_one(code: str, country_code: str) -> dict:
     return cache[key]
 
 
+@needs_cache
+def get_states_by_country(country_code):
+    if not isinstance(country_code, str) or not country_code.strip():
+        raise ValueError("Bad value for country_code")
+
+    cc = country_code.strip().upper()
+    states_list = []
+    for key, state in cache.items():
+        if state.get(COUNTRY_CODE) == cc:
+            state_copy = state.copy()
+            states_list.append(state_copy)
+    return states_list
+
+
 def main():
     create(SAMPLE_STATE)
     print(read())

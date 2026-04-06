@@ -277,6 +277,42 @@ class States(Resource):
             return {ERROR: str(e)}, 500
 
 
+@api.route(f"{STATES_EPS}/country/<string:country_code>")
+class StatesByCountry(Resource):
+    def get(self, country_code):
+        try:
+            all_states = sqry.read()
+            filtered_states = []
+            if isinstance(all_states, dict):
+                for state_code, state_data in all_states.items():
+                    if state_data.get('country_code') == country_code:
+                        filtered_states.append({
+                            'state_code': state_code,
+                            **state_data
+                        })
+            elif isinstance(all_states. list):
+                filtered_states = [
+                    state for state in all_states
+                    if state.get('country_code') == country_code
+                ]
+
+            if not filtered_states:
+                return {
+                    ERROR: f"No states found for country code '{country_code}'",
+                    "country_code": country_code
+                }, 404
+
+            return {
+                "success": True,
+                "country_code": country_code,
+                "count": len(filtered_states),
+                "states": filtered_states
+            }, 200
+        except Exception as e:
+            print(f"StatesByCountry - Error: {str(e)}")
+            return {ERROR: str(e)}, 500
+
+
 @api.route(f"{STATES_EPS}/count")
 class StateCount(Resource):
     """
