@@ -2,15 +2,18 @@
 This is the file containing all of the endpoints for our flask app.
 The endpoint called `endpoints` will return all available endpoints.
 """
+import os
+from datetime import timedelta
+from functools import wraps
 # from http import HTTPStatus
 import cities.cities_queries as cqry
 import countries.country_queries as cntry
 import states.states_queries as sqry
+import users.users_queries as user_qry
 
-from flask import Flask  # , request
+from flask import Flask, request, jsonify, session
 from flask_restx import Resource, Api  # , fields  # Namespace
 from flask_cors import CORS
-from flask import request
 
 # import werkzeug.exceptions as wz
 
@@ -37,6 +40,12 @@ CITY_RESP = "Cities"
 HEALTH_EP = "/health"
 VERSION_EP = "/version"
 VERSION_NAME = "project-sens"
+
+app.secret_key = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-production')
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(days=31)
+app.config['SESSION_COOKIE_SECURE'] = False  # Set True in production with HTTPS
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
 
 
 @api.route(f'{CITIES_EPS}/{READ}')
@@ -431,3 +440,115 @@ class StateDetails(Resource):
             return {ERROR: f"State '{state_code}', '{country_code}' not found"}, 404
         except ConnectionError as e:
             return {ERROR: str(e)}, 500
+
+# ============= AUTHENTICATION ENDPOINTS =============
+
+def login_required(f):
+    """Decorator to require authentication for endpoints."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'username' not in session:
+            return jsonify({'error': 'Authentication required'}), 401
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+@api.route('/auth/login')
+class Login(Resource):
+    """Login endpoint"""
+    def post(self):
+        """
+        Login with username and password.
+        Expects JSON: {"username": "...", "password": "..."}
+        """
+        try:
+            data = request.get_json()
+            
+            if not data:
+                return {'error': 'No data provided'}, 400
+            
+            username = data.get('username')
+            password = data.get('password')
+            
+            if not username or not password:
+                return {'error': 'Username and password are required'}, 400
+            
+            # Authenticate user
+            user = user_qry.authenticate(username, password)
+            
+            # Store username in session
+            session['username'] = username
+            session.permanent = True
+            
+            return {
+                'success': True,
+                'user': user
+            }, 200
+            
+        except ValueError as e:
+            return {'error': str(e)}, 401
+        except Exception as e:
+            print(f"Login error: {e}")
+            return {'error': 'Login failed'}, 500
+
+
+@api.route('/auth/logout')
+class Logout(Resource):
+    """Logout endpoint"""
+    def post(self):
+        """Logout - clears session"""
+        session.clear()
+        return {'success': True, 'message': 'Logged out'}, 200
+
+@api.route('/auth/session')
+class CheckSession(Resource):
+    """Check if user is logged in"""
+    def get(self):
+        """Check current session status"""
+        if 'username' in session:
+            username = session['username']
+            users = user_qry.read()
+            user = users.get(username)
+            
+            if user:
+                return {
+                    'loggedIn': True,
+                    'user': user
+                }, 200
+        
+        return {'loggedIn': False}, 200
+
+
+@api.route('/auth/register')
+class Register(Resource):
+    """User registration endpoint"""
+    def post(self):
+        """
+        Register a new user.
+        Expects JSON: {"username": "...", "password": "..."}
+        """
+        try:
+            data = request.get_json()
+            
+            if not data:
+                return {'error': 'No data provided'}, 400
+            
+            username = data.get('username')
+            password = data.get('password')
+            
+            if not username or not password:
+                return {'error': 'Username and password are required'}, 400
+            
+            user_id = user_qry.create_user(username, password)
+            
+            return {
+                'success': True,
+                'message': 'User created successfully',
+                'user_id': user_id
+            }, 201
+            
+        except ValueError as e:
+            return {'error': str(e)}, 400
+        except Exception as e:
+            print(f"Registration error: {e}")
+            return {'error': 'Registration failed'}, 500
