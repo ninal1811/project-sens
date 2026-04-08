@@ -441,7 +441,9 @@ class StateDetails(Resource):
         except ConnectionError as e:
             return {ERROR: str(e)}, 500
 
+
 # ============= AUTHENTICATION ENDPOINTS =============
+
 
 def login_required(f):
     """Decorator to require authentication for endpoints."""
@@ -463,28 +465,28 @@ class Login(Resource):
         """
         try:
             data = request.get_json()
-            
+
             if not data:
                 return {'error': 'No data provided'}, 400
-            
+
             username = data.get('username')
             password = data.get('password')
-            
+
             if not username or not password:
                 return {'error': 'Username and password are required'}, 400
-            
+
             # Authenticate user
             user = user_qry.authenticate(username, password)
-            
+
             # Store username in session
             session['username'] = username
             session.permanent = True
-            
+
             return {
                 'success': True,
                 'user': user
             }, 200
-            
+
         except ValueError as e:
             return {'error': str(e)}, 401
         except Exception as e:
@@ -500,6 +502,7 @@ class Logout(Resource):
         session.clear()
         return {'success': True, 'message': 'Logged out'}, 200
 
+
 @api.route('/auth/session')
 class CheckSession(Resource):
     """Check if user is logged in"""
@@ -509,13 +512,13 @@ class CheckSession(Resource):
             username = session['username']
             users = user_qry.read()
             user = users.get(username)
-            
+
             if user:
                 return {
                     'loggedIn': True,
                     'user': user
                 }, 200
-        
+
         return {'loggedIn': False}, 200
 
 
@@ -529,24 +532,24 @@ class Register(Resource):
         """
         try:
             data = request.get_json()
-            
+
             if not data:
                 return {'error': 'No data provided'}, 400
-            
+
             username = data.get('username')
             password = data.get('password')
-            
+
             if not username or not password:
                 return {'error': 'Username and password are required'}, 400
-            
+
             user_id = user_qry.create_user(username, password)
-            
+
             return {
                 'success': True,
                 'message': 'User created successfully',
                 'user_id': user_id
             }, 201
-            
+
         except ValueError as e:
             return {'error': str(e)}, 400
         except Exception as e:
