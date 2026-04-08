@@ -522,6 +522,24 @@ class CheckSession(Resource):
         return {'loggedIn': False}, 200
 
 
+@api.route('/auth/user')
+class CurrentUser(Resource):
+    """Get current authenticated user"""
+    def get(self):
+        """Get current user information"""
+        if 'username' not in session:
+            return {'error': 'Not authenticated'}, 401
+
+        username = session['username']
+        users = user_qry.read()
+        user = users.get(username)
+
+        if user:
+            return {'user': user}, 200
+
+        return {'error': 'User not found'}, 404
+
+
 @api.route('/auth/register')
 class Register(Resource):
     """User registration endpoint"""
