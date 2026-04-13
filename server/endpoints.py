@@ -31,6 +31,9 @@ HELLO_EP = "/hello"
 HELLO_RESP = "hello"
 MESSAGE = "Message"
 
+COUNTRIES_EPS = "/countries"
+COUNTRY_RESP = "Countries"
+
 STATES_EPS = "/states"
 STATE_RESP = "States"
 
@@ -256,6 +259,41 @@ class Countries(Resource):
             countries = cntry.read_all()
             return {"countries": countries}, 200
         except Exception as e:
+            return {ERROR: str(e)}, 500
+
+
+@api.route(f'{COUNTRIES_EPS}/<string:country_name>')
+class CountryDetails(Resource):
+    """
+    Get details for a specific country
+    """
+    def get(self, country_name):
+        """
+        Retrieve details for a single country by name
+        """
+        try:
+            countries = cntry.read()
+            if country_name not in countries:
+                return {ERROR: f"Country '{country_name}' not found"}, 404
+            return {
+                COUNTRY_RESP: country_name,
+                "details": countries[country_name]
+            }, 200
+        except ConnectionError as e:
+            return {ERROR: str(e)}, 500
+        except Exception as e:
+            return {ERROR: str(e)}, 500
+
+    def delete(self, country_name):
+        """
+        Delete a specific country by name
+        """
+        try:
+            result = cntry.delete(country_name)
+            if not result:
+                return {ERROR: f"Country '{country_name}' not found"}, 404
+            return {MESSAGE: f"Country '{country_name}' deleted successfully"}, 200
+        except ConnectionError as e:
             return {ERROR: str(e)}, 500
 
 
