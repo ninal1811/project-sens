@@ -262,6 +262,76 @@ class Countries(Resource):
             return {ERROR: str(e)}, 500
 
 
+@api.route(f"{COUNTRIES_EPS}/add")
+class AddCountry(Resource):
+    """
+    Add or update a state using the add_country method (upsert).
+    """
+    def post(self):
+        """
+        Add or update a country.
+        """
+        try:
+            print(f"AddCountry - Request data: {request.get_data(as_text=True)}")
+
+            data = request.get_json()
+            print(f"AddCountry - Parsed data: {data}")
+
+            if data is None:
+                return {ERROR: "Request must be JSON. Check Content-Type header is 'application/json'"}, 400
+
+            name = data.get('name')
+            country_code = data.get('country_code')
+            capital = data.get('capital')
+            nat_dish = data.get('nat_dish')
+            pop_dish_1 = data.get('pop_dish_1')
+            pop_dish_2 = data.get('pop_dish_2')
+
+            missing_fields = []
+            if not name:
+                missing_fields.append('name')
+            if not country_code:
+                missing_fields.append('country_code')
+            if not capital:
+                missing_fields.append('capital')
+            if not nat_dish:
+                missing_fields.append('nat_dish')
+            if not pop_dish_1:
+                missing_fields.append('pop_dish_1')
+            if not pop_dish_2:
+                missing_fields.append('pop_dish_2')
+
+            if missing_fields:
+                return {
+                    ERROR: f"Missing required fields: {', '.join(missing_fields)}",
+                    "received_data": data
+                }, 400
+
+            extra_fields = {k: v for k, v in data.items() if k not in ['country_code', 'nat_dish', 'capital', 'name', 'pop_dish_1', 'pop_dish_2']}
+
+            cntry.add_country(country_code, name, capital, nat_dish, pop_dish_1, pop_dish_2, **extra_fields)
+
+            return {
+                MESSAGE: "Country added/updated successfully",
+                COUNTRY_RESP: {
+                    "country_code": country_code,
+                    "name": name,
+                    "capital": capital,
+                    "nat_dish": nat_dish,
+                    "pop_dish_1": pop_dish_1,
+                    "pop_dish_2": pop_dish_2,
+                    **extra_fields
+                }
+            }, 201
+
+        except ValueError as e:
+            print(f"AddCountry - ValueError: {str(e)}")
+            return {ERROR: str(e)}, 400
+        except Exception as e:
+            print(f"AddCountry - Unexpected error: {str(e)}")
+            return {ERROR: f"Unexpected error: {str(e)}"}, 500
+
+
 @api.route(f'{COUNTRIES_EPS}/<string:country_name>')
 class CountryDetails(Resource):
     """
