@@ -64,7 +64,7 @@ class Cities(Resource):
         """
 
         try:
-            cqry.load_cache() 
+            cntry.load_cache()
             cities = cqry.read()
         # prints out the names and the valies with f string
         except ConnectionError as e:
@@ -257,7 +257,7 @@ class Countries(Resource):
         Retrieve all countries (cached).
         """
         try:
-            cqry.load_cache()  
+            cqry.load_cache()
             countries = cntry.read_all()
             return {"countries": countries}, 200
         except Exception as e:
@@ -346,7 +346,7 @@ class AddCountry(Resource):
             return {ERROR: f"Unexpected error: {str(e)}"}, 500
 
 
-@api.route(f'{COUNTRIES_EPS}/<string:country_name>')
+@api.route(f'{COUNTRIES_EPS}/<string:country_id>')
 class CountryDetails(Resource):
     """
     Get details for a specific country
@@ -368,15 +368,15 @@ class CountryDetails(Resource):
         except Exception as e:
             return {ERROR: str(e)}, 500
 
-    def delete(self, country_name):
+    def delete(self, country_id):
         """
         Delete a specific country by name
         """
         try:
-            result = cntry.delete_country(country_name)
+            result = cntry.delete_country(country_id)
             if not result:
-                return {ERROR: f"Country '{country_name}' not found"}, 404
-            return {MESSAGE: f"Country '{country_name}' deleted successfully"}, 200
+                return {ERROR: f"Country '{country_id}' not found"}, 404
+            return {MESSAGE: f"Country '{country_id}' deleted successfully"}, 200
         except ConnectionError as e:
             return {ERROR: str(e)}, 500
 
@@ -392,7 +392,7 @@ class States(Resource):
         Return all stored states.
         """
         try:
-            sqry.load_cache()  
+            sqry.load_cache()
             states = sqry.read()
 
             # If sqry.read() returns the cache dict (like your test_queries),
