@@ -64,7 +64,7 @@ class Cities(Resource):
         """
 
         try:
-            cntry.load_cache()
+            cqry.load_cache()
             cities = cqry.read()
         # prints out the names and the valies with f string
         except ConnectionError as e:
@@ -257,7 +257,7 @@ class Countries(Resource):
         Retrieve all countries (cached).
         """
         try:
-            cqry.load_cache()
+            cntry.load_cache()
             countries = cntry.read_all()
             return {"countries": countries}, 200
         except Exception as e:
@@ -377,6 +377,8 @@ class CountryDetails(Resource):
             if not result:
                 return {ERROR: f"Country '{country_id}' not found"}, 404
             return {MESSAGE: f"Country '{country_id}' deleted successfully"}, 200
+        except ValueError as e:  # ← ADD THIS
+            return {ERROR: str(e)}, 404
         except ConnectionError as e:
             return {ERROR: str(e)}, 500
 
