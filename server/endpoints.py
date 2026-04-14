@@ -64,6 +64,7 @@ class Cities(Resource):
         """
 
         try:
+            cqry.load_cache() 
             cities = cqry.read()
         # prints out the names and the valies with f string
         except ConnectionError as e:
@@ -256,6 +257,7 @@ class Countries(Resource):
         Retrieve all countries (cached).
         """
         try:
+            cqry.load_cache()  
             countries = cntry.read_all()
             return {"countries": countries}, 200
         except Exception as e:
@@ -390,6 +392,7 @@ class States(Resource):
         Return all stored states.
         """
         try:
+            sqry.load_cache()  
             states = sqry.read()
 
             # If sqry.read() returns the cache dict (like your test_queries),
