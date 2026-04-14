@@ -350,7 +350,7 @@ class CountryDetails(Resource):
         Retrieve details for a single country by name
         """
         try:
-            countries = cntry.read()
+            countries = cntry.read_all()
             if country_name not in countries:
                 return {ERROR: f"Country '{country_name}' not found"}, 404
             return {
