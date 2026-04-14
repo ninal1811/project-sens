@@ -713,4 +713,3 @@ class Register(Resource):
         except Exception as e:
             print(f"Registration error: {e}")
             return {'error': 'Registration failed'}, 500
-
