@@ -574,8 +574,23 @@ def login_required(f):
     """Decorator to require authentication for endpoints."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'username' not in session:
+        if 'email' not in session:
             return jsonify({'error': 'Authentication required'}), 401
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+def developer_required(f):
+    """Decorator to require developer access."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'email' not in session:
+            return jsonify({'error': 'Authentication required'}), 401
+
+        email = session['email']
+        if not user_qry.is_user_developer(email):
+            return jsonify({'error': 'Developer access required'}), 403
+
         return f(*args, **kwargs)
     return decorated_function
 
@@ -585,8 +600,8 @@ class Login(Resource):
     """Login endpoint"""
     def post(self):
         """
-        Login with username and password.
-        Expects JSON: {"username": "...", "password": "..."}
+        Login with email and password.
+        Expects JSON: {"email": "...", "password": "..."}
         """
         try:
             data = request.get_json()
@@ -594,17 +609,17 @@ class Login(Resource):
             if not data:
                 return {'error': 'No data provided'}, 400
 
-            username = data.get('username')
+            email = data.get('email')
             password = data.get('password')
 
-            if not username or not password:
-                return {'error': 'Username and password are required'}, 400
+            if not email or not password:
+                return {'error': 'Email and password are required'}, 400
 
             # Authenticate user
-            user = user_qry.authenticate(username, password)
+            user = user_qry.authenticate(email, password)
 
-            # Store username in session
-            session['username'] = username
+            # Store email in session
+            session['email'] = email
             session.permanent = True
 
             return {
@@ -633,10 +648,10 @@ class CheckSession(Resource):
     """Check if user is logged in"""
     def get(self):
         """Check current session status"""
-        if 'username' in session:
-            username = session['username']
+        if 'email' in session:
+            email = session['email']
             users = user_qry.read()
-            user = users.get(username)
+            user = users.get(email)
 
             if user:
                 return {
@@ -652,12 +667,12 @@ class CurrentUser(Resource):
     """Get current authenticated user"""
     def get(self):
         """Get current user information"""
-        if 'username' not in session:
+        if 'email' not in session:
             return {'error': 'Not authenticated'}, 401
 
-        username = session['username']
+        email = session['email']
         users = user_qry.read()
-        user = users.get(username)
+        user = users.get(email)
 
         if user:
             return {'user': user}, 200
@@ -671,7 +686,7 @@ class Register(Resource):
     def post(self):
         """
         Register a new user.
-        Expects JSON: {"username": "...", "password": "..."}
+        Expects JSON: {"email": "...", "password": "..."}
         """
         try:
             data = request.get_json()
@@ -679,13 +694,13 @@ class Register(Resource):
             if not data:
                 return {'error': 'No data provided'}, 400
 
-            username = data.get('username')
+            email = data.get('email')
             password = data.get('password')
 
-            if not username or not password:
-                return {'error': 'Username and password are required'}, 400
+            if not email or not password:
+                return {'error': 'Email and password are required'}, 400
 
-            user_id = user_qry.create_user(username, password)
+            user_id = user_qry.create_user(email, password, is_developer=False)
 
             return {
                 'success': True,
@@ -698,3 +713,4 @@ class Register(Resource):
         except Exception as e:
             print(f"Registration error: {e}")
             return {'error': 'Registration failed'}, 500
+
