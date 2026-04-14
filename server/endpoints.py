@@ -309,7 +309,15 @@ class AddCountry(Resource):
 
             extra_fields = {k: v for k, v in data.items() if k not in ['country_code', 'nat_dish', 'capital', 'name', 'pop_dish_1', 'pop_dish_2']}
 
-            cntry.add_country(country_code, name, capital, nat_dish, pop_dish_1, pop_dish_2, **extra_fields)
+            cntry.add_country(
+                country_code,
+                name,
+                capital,
+                nat_dish=nat_dish,
+                pop_dish_1=pop_dish_1,
+                pop_dish_2=pop_dish_2,
+                **extra_fields
+            )
 
             return {
                 MESSAGE: "Country added/updated successfully",
@@ -359,7 +367,7 @@ class CountryDetails(Resource):
         Delete a specific country by name
         """
         try:
-            result = cntry.delete(country_name)
+            result = cntry.delete_country(country_name)
             if not result:
                 return {ERROR: f"Country '{country_name}' not found"}, 404
             return {MESSAGE: f"Country '{country_name}' deleted successfully"}, 200
