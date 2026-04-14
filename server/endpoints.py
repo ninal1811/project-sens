@@ -308,7 +308,11 @@ class AddCountry(Resource):
                 }, 400
 
             extra_fields = {k: v for k, v in data.items() if k not in ['country_code', 'nat_dish', 'capital', 'name', 'pop_dish_1', 'pop_dish_2']}
-
+            # ADD THESE DEBUG PRINTS
+            print(f"DEBUG - extra_fields: {extra_fields}")
+            print(f"DEBUG - nat_dish_dietary in data: {data.get('nat_dish_dietary')}")
+            print(f"DEBUG - pop_dish_1_dietary in data: {data.get('pop_dish_1_dietary')}")
+            print(f"DEBUG - pop_dish_2_dietary in data: {data.get('pop_dish_2_dietary')}")
             cntry.add_country(
                 country_code,
                 name,
