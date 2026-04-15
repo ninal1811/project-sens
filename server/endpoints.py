@@ -18,9 +18,7 @@ from flask_cors import CORS
 # import werkzeug.exceptions as wz
 
 app = Flask(__name__)
-CORS(app, origins=[
-         'http://localhost:5173',
-     ],
+CORS(app, origins=['http://localhost:5173'],
      supports_credentials=True)
 api = Api(app)
 
@@ -380,7 +378,7 @@ class CountryDetails(Resource):
             if not result:
                 return {ERROR: f"Country '{country_id}' not found"}, 404
             return {MESSAGE: f"Country '{country_id}' deleted successfully"}, 200
-        except ValueError as e:  # ← ADD THIS
+        except ValueError as e:
             return {ERROR: str(e)}, 404
         except ConnectionError as e:
             return {ERROR: str(e)}, 500
