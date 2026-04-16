@@ -714,3 +714,70 @@ class Register(Resource):
         except Exception as e:
             print(f"Registration error: {e}")
             return {'error': 'Registration failed'}, 500
+# ============= DEVELOPER ENDPOINTS =============
+
+
+@api.route('/dev/logs')
+class DevLogs(Resource):
+    """Developer-only endpoint to view server logs"""
+    @developer_required
+    def get(self):
+        """List available log files in /var/log"""
+        import os
+        import glob
+
+        try:
+            log_dir = '/var/log'
+            # Get all .log files
+            log_files = glob.glob(os.path.join(log_dir, '*.log*'))
+
+            # Sort by modification time (newest first)
+            log_files = sorted(log_files, key=os.path.getmtime, reverse=True)
+
+            # Get just the filenames
+            log_list = [os.path.basename(f) for f in log_files[:50]]  # Limit to 50 most recent
+
+            return {
+                'log_directory': log_dir,
+                'log_files': log_list,
+                'count': len(log_list)
+            }, 200
+
+        except Exception as e:
+            return {'error': f'Failed to list logs: {str(e)}'}, 500
+
+
+@api.route('/dev/logs/<path:filename>')
+class DevLogFile(Resource):
+    """Developer-only endpoint to read a specific log file"""
+    @developer_required
+    def get(self, filename):
+        """Read contents of a specific log file"""
+        import os
+
+        try:
+            log_path = os.path.join('/var/log', filename)
+
+            # Security: prevent path traversal
+            if '..' in filename or filename.startswith('/'):
+                return {'error': 'Invalid filename'}, 400
+
+            if not os.path.exists(log_path):
+                return {'error': 'Log file not found'}, 404
+
+            # Read last 1000 lines
+            with open(log_path, 'r', errors='ignore') as f:
+                lines = f.readlines()
+                last_lines = lines[-1000:]  # Last 1000 lines
+
+            return {
+                'filename': filename,
+                'lines': last_lines,
+                'total_lines': len(lines),
+                'showing_lines': len(last_lines)
+            }, 200
+
+        except PermissionError:
+            return {'error': 'Permission denied'}, 403
+        except Exception as e:
+            return {'error': f'Failed to read log: {str(e)}'}, 500
