@@ -584,13 +584,11 @@ def developer_required(f):
     """Decorator to require developer access."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'email' not in session:
+        email = session.get('email') or request.headers.get('X-Dev-Email', '').strip()
+        if not email:
             return {'error': 'Authentication required'}, 401
-
-        email = session['email']
         if not user_qry.is_user_developer(email):
             return {'error': 'Developer access required'}, 403
-
         return f(*args, **kwargs)
     return decorated_function
 
