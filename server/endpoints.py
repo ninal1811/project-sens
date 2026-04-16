@@ -581,20 +581,18 @@ def login_required(f):
     return decorated_function
 
 
-def developer_required(f):
-    """Decorator to require developer access."""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if 'email' not in session:
-            return jsonify({'error': 'Authentication required'}), 401
+def developer_required(f):                                                    
+      @wraps(f)                                             
+      def decorated_function(*args, **kwargs):
+          if 'email' not in session:
+              return {'error': 'Authentication required'}, 401
+                                                                                
+          email = session['email']
+          if not user_qry.is_user_developer(email):                             
+              return {'error': 'Developer access required'}, 403
 
-        email = session['email']
-        if not user_qry.is_user_developer(email):
-            return jsonify({'error': 'Developer access required'}), 403
-
-        return f(*args, **kwargs)
-    return decorated_function
-
+          return f(*args, **kwargs)
+      return decorated_function
 
 @api.route('/auth/login')
 class Login(Resource):
