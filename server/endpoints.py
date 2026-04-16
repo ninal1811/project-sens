@@ -18,7 +18,7 @@ from flask_cors import CORS
 # import werkzeug.exceptions as wz
 
 app = Flask(__name__)
-CORS(app, origins=['http://localhost:5173'],
+CORS(app, origins=['http://localhost:5173', 'https://ninal1811.github.io'],
      supports_credentials=True)
 api = Api(app)
 
@@ -122,7 +122,6 @@ class Version(Resource):
             "version": os.getenv("APP_VERSION", "0.1.0"),
             "env": os.getenv("APP_ENV", "dev"),
         }, 200
-# Helper function for testing raise and enpoint behavior
 
 
 def parse_limit(raw):
@@ -425,7 +424,7 @@ class StatesByCountry(Resource):
                             'state_code': state_code,
                             **state_data
                         })
-            elif isinstance(all_states. list):
+            elif isinstance(all_states, list):
                 filtered_states = [
                     state for state in all_states
                     if state.get('country_code') == country_code
@@ -581,18 +580,20 @@ def login_required(f):
     return decorated_function
 
 
-def developer_required(f):                                                    
-      @wraps(f)                                             
-      def decorated_function(*args, **kwargs):
-          if 'email' not in session:
-              return {'error': 'Authentication required'}, 401
-                                                                                
-          email = session['email']
-          if not user_qry.is_user_developer(email):                             
-              return {'error': 'Developer access required'}, 403
+def developer_required(f):
+    """Decorator to require developer access."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'email' not in session:
+            return {'error': 'Authentication required'}, 401
 
-          return f(*args, **kwargs)
-      return decorated_function
+        email = session['email']
+        if not user_qry.is_user_developer(email):
+            return {'error': 'Developer access required'}, 403
+
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 @api.route('/auth/login')
 class Login(Resource):
@@ -712,6 +713,8 @@ class Register(Resource):
         except Exception as e:
             print(f"Registration error: {e}")
             return {'error': 'Registration failed'}, 500
+
+
 # ============= DEVELOPER ENDPOINTS =============
 
 
@@ -733,7 +736,7 @@ class DevLogs(Resource):
             log_files = sorted(log_files, key=os.path.getmtime, reverse=True)
 
             # Get just the filenames
-            log_list = [os.path.basename(f) for f in log_files[:50]]  # Limit to 50 most recent
+            log_list = [os.path.basename(f) for f in log_files[:50]]
 
             return {
                 'log_directory': log_dir,
