@@ -12,7 +12,7 @@ import countries.country_queries as cntry
 import states.states_queries as sqry
 import users.users_queries as user_qry
 
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, session
 from flask_restx import Resource, Api  # , fields  # Namespace
 from flask_cors import CORS
 
@@ -719,7 +719,8 @@ class DevLogs(Resource):
         try:
             log_dir = '/var/log'
             # Get all .log files
-            log_files = glob.glob(os.path.join(log_dir, '*.log*'))
+            log_files = [f for f in glob.glob(os.path.join(log_dir, '*.log*'))
+                         if not f.endswith('.gz')]
 
             # Sort by modification time (newest first)
             log_files = sorted(log_files, key=os.path.getmtime, reverse=True)
