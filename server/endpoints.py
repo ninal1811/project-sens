@@ -3,6 +3,7 @@ This is the file containing all of the endpoints for our flask app.
 The endpoint called `endpoints` will return all available endpoints.
 """
 import os
+import glob
 from datetime import timedelta
 from functools import wraps
 # from http import HTTPStatus
@@ -574,33 +575,28 @@ def login_required(f):
     """Decorator to require authentication for endpoints."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'email' not in session:
-            return jsonify({'error': 'Authentication required'}), 401
+        email = session.get('email') or request.headers.get('X-Dev-Email', '').strip()
+        if not email:
+            return {'error': 'Authentication required'}, 401
         return f(*args, **kwargs)
     return decorated_function
 
 
 def developer_required(f):
-    """Decorator to require developer access."""
+    """Decorator to require developer access. Wraps login_required."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
         email = session.get('email') or request.headers.get('X-Dev-Email', '').strip()
-        if not email:
-            return {'error': 'Authentication required'}, 401
         if not user_qry.is_user_developer(email):
             return {'error': 'Developer access required'}, 403
         return f(*args, **kwargs)
-    return decorated_function
+    return login_required(decorated_function)
 
 
 @api.route('/auth/login')
 class Login(Resource):
     """Login endpoint"""
     def post(self):
-        """
-        Login with email and password.
-        Expects JSON: {"email": "...", "password": "..."}
-        """
         try:
             data = request.get_json()
 
@@ -613,7 +609,6 @@ class Login(Resource):
             if not email or not password:
                 return {'error': 'Email and password are required'}, 400
 
-            # Authenticate user
             user = user_qry.authenticate(email, password)
 
             # Store email in session
@@ -663,12 +658,10 @@ class CheckSession(Resource):
 @api.route('/auth/user')
 class CurrentUser(Resource):
     """Get current authenticated user"""
+    @login_required
     def get(self):
         """Get current user information"""
-        if 'email' not in session:
-            return {'error': 'Not authenticated'}, 401
-
-        email = session['email']
+        email = session.get('email') or request.headers.get('X-Dev-Email', '').strip()
         users = user_qry.read()
         user = users.get(email)
 
@@ -722,8 +715,6 @@ class DevLogs(Resource):
     @developer_required
     def get(self):
         """List available log files in /var/log"""
-        import os
-        import glob
 
         try:
             log_dir = '/var/log'

@@ -84,7 +84,7 @@ def create_user(email: str, password: str, is_developer: bool = False) -> str:
     # Create user document
     user_doc = {
         EMAIL: email,
-        PASSWORD: password,  # Plain text - INSECURE!
+        PASSWORD: password, 
         IS_DEVELOPER: is_developer,
     }
 
