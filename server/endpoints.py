@@ -712,6 +712,39 @@ class Register(Resource):
             return {'error': 'Registration failed'}, 500
 
 
+@api.route('/auth/password')
+class UpdatePassword(Resource):
+    """Update the authenticated user's password"""
+    @login_required
+    def put(self):
+        """
+        Update password for the logged-in user.
+        Expects JSON: {"current_password": "...", "new_password": "..."}
+        """
+        try:
+            data = request.get_json()
+            if not data:
+                return {'error': 'No data provided'}, 400
+
+            current_password = data.get('current_password')
+            new_password = data.get('new_password')
+
+            if not current_password or not new_password:
+                return {'error': 'current_password and new_password are required'}, 400
+
+            email = session.get('email') or request.headers.get('X-Dev-Email', '').strip()
+            user_qry.authenticate(email, current_password)
+            user_qry.update_password(email, new_password)
+
+            return {'success': True, 'message': 'Password updated successfully'}, 200
+
+        except ValueError as e:
+            return {'error': str(e)}, 400
+        except Exception as e:
+            print(f"Password update error: {e}")
+            return {'error': 'Password update failed'}, 500
+
+
 # ============= DEVELOPER ENDPOINTS =============
 
 
