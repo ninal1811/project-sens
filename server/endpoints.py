@@ -53,6 +53,28 @@ app.config['SESSION_COOKIE_HTTPONLY'] = True
 app.config['SESSION_COOKIE_SAMESITE'] = 'None'
 
 
+def login_required(f):
+    """Decorator to require authentication for endpoints."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        email = session.get('email') or request.headers.get('X-Dev-Email', '').strip()
+        if not email:
+            return {'error': 'Authentication required'}, 401
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+def developer_required(f):
+    """Decorator to require developer access. Wraps login_required."""
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        email = session.get('email') or request.headers.get('X-Dev-Email', '').strip()
+        if not user_qry.is_user_developer(email):
+            return {'error': 'Developer access required'}, 403
+        return f(*args, **kwargs)
+    return login_required(decorated_function)
+
+
 @api.route(f'{CITIES_EPS}/{READ}')
 class Cities(Resource):
     """
@@ -142,6 +164,7 @@ def parse_limit(raw):
 
 @api.route(f'{CITIES_EPS}/add')
 class AddCity(Resource):
+    @login_required
     def post(self):
         """
         Add or update a city.
@@ -221,6 +244,7 @@ class CityDetails(Resource):
         except Exception as e:
             return {ERROR: str(e)}, 500
 
+    @login_required
     def delete(self, city_name):
         """
         Delete a specific city by name
@@ -270,6 +294,7 @@ class AddCountry(Resource):
     """
     Add or update a state using the add_country method (upsert).
     """
+    @login_required
     def post(self):
         """
         Add or update a country.
@@ -369,6 +394,7 @@ class CountryDetails(Resource):
         except Exception as e:
             return {ERROR: str(e)}, 500
 
+    @login_required
     def delete(self, country_id):
         """
         Delete a specific country by name
@@ -470,6 +496,7 @@ class AddState(Resource):
     """
     Add or update a state using the add_state method (upsert).
     """
+    @login_required
     def post(self):
         """
         Add or update a state.
@@ -549,6 +576,7 @@ class StateDetails(Resource):
         except Exception as e:
             return {ERROR: str(e)}, 500
 
+    @login_required
     def delete(self, state_code, country_code):
         """
         Delete a specific state by code and country code.
@@ -569,28 +597,6 @@ class StateDetails(Resource):
 
 
 # ============= AUTHENTICATION ENDPOINTS =============
-
-
-def login_required(f):
-    """Decorator to require authentication for endpoints."""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        email = session.get('email') or request.headers.get('X-Dev-Email', '').strip()
-        if not email:
-            return {'error': 'Authentication required'}, 401
-        return f(*args, **kwargs)
-    return decorated_function
-
-
-def developer_required(f):
-    """Decorator to require developer access. Wraps login_required."""
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        email = session.get('email') or request.headers.get('X-Dev-Email', '').strip()
-        if not user_qry.is_user_developer(email):
-            return {'error': 'Developer access required'}, 403
-        return f(*args, **kwargs)
-    return login_required(decorated_function)
 
 
 @api.route('/auth/login')

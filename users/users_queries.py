@@ -1,11 +1,13 @@
 from functools import wraps
 import data.db_connect as dbc
+from werkzeug.security import generate_password_hash, check_password_hash
 
 USERS_COLLECTION = "users"
 
 EMAIL = "email"
 PASSWORD = "password"
 IS_DEVELOPER = "is_developer"
+MIN_PASSWORD_LENGTH = 8
 
 cache = None
 
@@ -65,12 +67,15 @@ def read() -> dict:
 
 
 def create_user(email: str, password: str, is_developer: bool = False) -> str:
-    """Create a new user with plain text password (INSECURE!)."""
+    """Create a new user with a hashed password."""
     if not email or not isinstance(email, str):
         raise ValueError("Email is required")
 
     if not password or not isinstance(password, str):
         raise ValueError("Password is required")
+
+    if len(password) < MIN_PASSWORD_LENGTH:
+        raise ValueError(f"Password must be at least {MIN_PASSWORD_LENGTH} characters")
 
     # Basic email validation
     if '@' not in email:
@@ -84,7 +89,7 @@ def create_user(email: str, password: str, is_developer: bool = False) -> str:
     # Create user document
     user_doc = {
         EMAIL: email,
-        PASSWORD: password, 
+        PASSWORD: generate_password_hash(password),
         IS_DEVELOPER: is_developer,
     }
 
@@ -106,7 +111,7 @@ def authenticate(email: str, password: str) -> dict:
     if not stored_password:
         raise ValueError("User has no password set")
 
-    if password != stored_password:
+    if not check_password_hash(stored_password, password):
         raise ValueError("Invalid email or password")
 
     safe_user = {k: v for k, v in user_doc.items() if k != PASSWORD}
@@ -135,7 +140,9 @@ def delete_user(email: str) -> bool:
 
 
 def update_password(email: str, new_password: str) -> bool:
-    ret = dbc.update(USERS_COLLECTION, {EMAIL: email}, {PASSWORD: new_password})
+    if len(new_password) < MIN_PASSWORD_LENGTH:
+        raise ValueError(f"Password must be at least {MIN_PASSWORD_LENGTH} characters")
+    ret = dbc.update(USERS_COLLECTION, {EMAIL: email}, {PASSWORD: generate_password_hash(new_password)})
 
     if ret.modified_count < 1:
         raise ValueError(f"User not found: {email}")
