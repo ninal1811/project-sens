@@ -164,7 +164,6 @@ def parse_limit(raw):
 
 @api.route(f'{CITIES_EPS}/add')
 class AddCity(Resource):
-    @login_required
     def post(self):
         """
         Add or update a city.
@@ -244,7 +243,6 @@ class CityDetails(Resource):
         except Exception as e:
             return {ERROR: str(e)}, 500
 
-    @login_required
     def delete(self, city_name):
         """
         Delete a specific city by name
@@ -294,7 +292,6 @@ class AddCountry(Resource):
     """
     Add or update a state using the add_country method (upsert).
     """
-    @login_required
     def post(self):
         """
         Add or update a country.
@@ -394,7 +391,6 @@ class CountryDetails(Resource):
         except Exception as e:
             return {ERROR: str(e)}, 500
 
-    @login_required
     def delete(self, country_id):
         """
         Delete a specific country by name
@@ -496,7 +492,6 @@ class AddState(Resource):
     """
     Add or update a state using the add_state method (upsert).
     """
-    @login_required
     def post(self):
         """
         Add or update a state.
@@ -576,7 +571,6 @@ class StateDetails(Resource):
         except Exception as e:
             return {ERROR: str(e)}, 500
 
-    @login_required
     def delete(self, state_code, country_code):
         """
         Delete a specific state by code and country code.
