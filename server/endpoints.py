@@ -3,7 +3,6 @@ This is the file containing all of the endpoints for our flask app.
 The endpoint called `endpoints` will return all available endpoints.
 """
 import os
-import glob
 from datetime import timedelta
 from functools import wraps
 # from http import HTTPStatus
@@ -741,34 +740,48 @@ class UpdatePassword(Resource):
 
 # ============= DEVELOPER ENDPOINTS =============
 
-
 @api.route('/dev/logs')
 class DevLogs(Resource):
-    """Developer-only endpoint to view server logs"""
     @developer_required
     def get(self):
-        """List available log files in /var/log"""
-
+        """Developer-only endpoint to view server logs"""
         try:
             log_dir = '/var/log'
-            # Get all .log files
-            log_files = [f for f in glob.glob(os.path.join(log_dir, '*.log*'))
-                         if not f.endswith('.gz')]
 
-            # Sort by modification time (newest first)
-            log_files = sorted(log_files, key=os.path.getmtime, reverse=True)
+            # Filter to only the three we want (no .1 archives)
+            desired_logs = [
+                'projectsens.pythonanywhere.com.access.log',
+                'projectsens.pythonanywhere.com.error.log',
+                'projectsens.pythonanywhere.com.server.log'
+            ]
 
-            # Get just the filenames
-            log_list = [os.path.basename(f) for f in log_files[:50]]
+            # Map filenames to friendly names
+            log_name_map = {
+                'projectsens.pythonanywhere.com.access.log': 'HTTP Access Log',
+                'projectsens.pythonanywhere.com.error.log': 'Error Log',
+                'projectsens.pythonanywhere.com.server.log': 'Application Log'
+            }
+
+            # Build response with friendly names
+            logs = []
+            for filename in desired_logs:
+                full_path = os.path.join(log_dir, filename)
+                if os.path.exists(full_path):
+                    logs.append({
+                        'name': log_name_map[filename],
+                        'filename': filename,
+                        'size_kb': round(
+                            os.path.getsize(full_path) / 1024, 2)
+                    })
 
             return {
                 'log_directory': log_dir,
-                'log_files': log_list,
-                'count': len(log_list)
+                'logs': logs,
+                'count': len(logs)
             }, 200
 
         except Exception as e:
-            return {'error': f'Failed to list logs: {str(e)}'}, 500
+            return {'error': str(e)}, 500
 
 
 @api.route('/dev/logs/<path:filename>')
