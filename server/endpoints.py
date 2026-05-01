@@ -20,7 +20,14 @@ from flask_cors import CORS
 app = Flask(__name__)
 CORS(app, origins=['http://localhost:5173', 'https://ninal1811.github.io'],
      supports_credentials=True)
-api = Api(app)
+authorizations = {
+    'developerEmail': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'Developer-Email',
+    }
+}
+api = Api(app, authorizations=authorizations)
 
 ERROR = "Error"
 READ = "read"
@@ -56,7 +63,7 @@ def login_required(f):
     """Decorator to require authentication for endpoints."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        email = session.get('email') or request.headers.get('X-Dev-Email', '').strip()
+        email = session.get('email') or request.headers.get('Developer-Email', '').strip()
         if not email:
             return {'error': 'Authentication required'}, 401
         return f(*args, **kwargs)
@@ -67,7 +74,7 @@ def developer_required(f):
     """Decorator to require developer access. Wraps login_required."""
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        email = session.get('email') or request.headers.get('X-Dev-Email', '').strip()
+        email = session.get('email') or request.headers.get('Developer-Email', '').strip()
         if not user_qry.is_user_developer(email):
             return {'error': 'Developer access required'}, 403
         return f(*args, **kwargs)
@@ -660,7 +667,7 @@ class CurrentUser(Resource):
     @login_required
     def get(self):
         """Get current user information"""
-        email = session.get('email') or request.headers.get('X-Dev-Email', '').strip()
+        email = session.get('email') or request.headers.get('Developer-Email', '').strip()
         users = user_qry.read()
         user = users.get(email)
 
@@ -725,7 +732,7 @@ class UpdatePassword(Resource):
             if not current_password or not new_password:
                 return {'error': 'current_password and new_password are required'}, 400
 
-            email = session.get('email') or request.headers.get('X-Dev-Email', '').strip()
+            email = session.get('email') or request.headers.get('Developer-Email', '').strip()
             user_qry.authenticate(email, current_password)
             user_qry.update_password(email, new_password)
 
@@ -741,6 +748,7 @@ class UpdatePassword(Resource):
 # ============= DEVELOPER ENDPOINTS =============
 
 @api.route('/dev/logs')
+@api.doc(security='developerEmail')
 class DevLogs(Resource):
     @developer_required
     def get(self):
@@ -785,6 +793,7 @@ class DevLogs(Resource):
 
 
 @api.route('/dev/logs/<path:filename>')
+@api.doc(security='developerEmail')
 class DevLogFile(Resource):
     """Developer-only endpoint to read a specific log file"""
     @developer_required
