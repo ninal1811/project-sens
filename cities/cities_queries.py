@@ -12,10 +12,10 @@ REC_RESTAURANT = "rec_restaurant"
 cache = None
 
 SAMPLE_CITY = {
-    CITY: "New York",
-    STATE_CODE: "NY",
-    COUNTRY_CODE: "US",
-    REC_RESTAURANT: "Katz's Delicatessen",
+    CITY: "ZZTEST_City",
+    STATE_CODE: "ZZ",
+    COUNTRY_CODE: "ZZ",
+    REC_RESTAURANT: "ZZTEST_Restaurant",
 }
 
 
